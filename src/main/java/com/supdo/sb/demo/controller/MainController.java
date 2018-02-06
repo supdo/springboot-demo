@@ -34,6 +34,7 @@ public class MainController extends BaseController {
 	@RequestMapping({"/", "/default"})
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");
+		//map.put("test", "test");
 		return this.render("default");
 	}
 	
