@@ -27,12 +27,12 @@ public class SysPermission extends BaseEntity implements Serializable{
     private Long id;
 	
 	@Size(min=5, max=30)
-	@FormMeta(type=FormType.text, label="权限编码", required=true, placeholder="权限编码", groups= {IPermission.class})
+	@FormMeta(label="权限编码", required=true, placeholder="权限编码", groups= {IPermission.class})
 	@Column(nullable=false, length=30)
 	private String code;
 	
 	@Size(min=5, max=30)
-	@FormMeta(type=FormType.text, label="权限名", required=true, placeholder="权限名", groups= {IPermission.class})
+	@FormMeta(label="权限名", required=true, placeholder="权限名", groups= {IPermission.class})
 	@Column(nullable=false, length=50)
 	private String name;
 	
