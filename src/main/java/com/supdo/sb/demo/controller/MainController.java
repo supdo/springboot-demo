@@ -35,7 +35,7 @@ public class MainController extends BaseController {
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");
 		//map.put("test", "test");
-		return this.render("default");
+		return render("default");
 	}
 	
 	@PostMapping("/login")
@@ -69,7 +69,7 @@ public class MainController extends BaseController {
 		SysUser user = new SysUser();
 		user.initForm(SysUser.IUserLogin.class);
 		map.put("user", user);
-		return "login";
+		return render("login");
 	}
 	
 	@PostMapping(path="/logon")
@@ -104,7 +104,7 @@ public class MainController extends BaseController {
 		SysUser user = new SysUser();
 		user.initForm(SysUser.IUser.class);
 		map.put("user", user);
-		return "logon";
+		return render("logon");
 	}
 
 	@RequestMapping(path="/logout")

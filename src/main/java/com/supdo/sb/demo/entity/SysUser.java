@@ -34,22 +34,22 @@ public class SysUser extends BaseEntity implements Serializable{
     private Long id;
 	
 	@Size(min=5, max=30, groups={IUser.class, IUserLogin.class})
-	@FormMeta(type=FormType.Text, label="用户名", required=true, placeholder="用户名", groups= {IUser.class, IUserLogin.class})
+	@FormMeta(type=FormType.text, label="用户名", required=true, placeholder="用户名", groups= {IUser.class, IUserLogin.class})
 	@Column(unique=true, nullable=false, length=30)
 	private String username;
 	
 	@Size(min=5, max=30, groups={IUser.class, IUserLogin.class})
-	@FormMeta(type=FormType.PassWord, label="密码", required=true, placeholder="密码", groups= {IUser.class, IUserLogin.class})
+	@FormMeta(type=FormType.password, label="密码", required=true, placeholder="密码", groups= {IUser.class, IUserLogin.class})
 	@Column(nullable=false)
 	private String password;
 	
     @Size(min=3, max=30, groups={IUser.class})
     @Transient
-    @FormMeta(type=FormType.PassWord, label="确认密码", required=true, placeholder="确认密码", groups= {IUser.class})
+    @FormMeta(type=FormType.password, label="确认密码", required=true, placeholder="确认密码", groups= {IUser.class})
     private String rePassword;
 	
 	@Size(min=5, max=30, groups={IUser.class, IUserLogin.class})
-	@FormMeta(type=FormType.Text, label="昵称", required=true, placeholder="昵称", groups= {IUser.class})
+	@FormMeta(type=FormType.text, label="昵称", required=true, placeholder="昵称", groups= {IUser.class})
 	@Column(length=30)
 	private String nickname;
 	

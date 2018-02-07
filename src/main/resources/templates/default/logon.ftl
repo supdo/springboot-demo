@@ -20,21 +20,26 @@
     </style>
 </head>
 <body>
-<div id="app" v-cloak>
-<a href="/login">登录</a>
+<#import "/default/lib/form.ftl" as mf>
+<div id="logonApp" v-cloak>
+    <i-form ref="logonForm" :model="formData" :label-width="80">
+        <@mf.Hform items=user.fields/>
+    </i-form>
 </div>
 <script type="text/javascript" src="/js/vue.js"></script>
 <script type="text/javascript" src="/iview/iview.js"></script>
 <script type="text/javascript">
-var loginApp = new Vue({
-    el: "#app",
-    data: {
+    var app = new Vue({
+        el: "#logonApp",
+        data: {
+            formData: {
+                name: ""
+            }
+        },
+        methods: {
 
-    },
-    methods: {
-
-    }
-});
+        }
+    });
 </script>
 </body>
 </html>

@@ -31,17 +31,17 @@ public class SysRole extends BaseEntity implements Serializable {
     private Long id;
 	
 	@Size(min=5, max=30)
-	@FormMeta(type=FormType.Text, label="角色名", required=true, placeholder="角色名", groups= {IRole.class})
+	@FormMeta(type=FormType.text, label="角色名", required=true, placeholder="角色名", groups= {IRole.class})
 	@Column(nullable=false, length=30)
 	private String name;
 	
 	@Size(min=5, max=30)
-	@FormMeta(type=FormType.Text, label="角色编码", required=true, placeholder="角色编码", groups= {IRole.class})
+	@FormMeta(type=FormType.text, label="角色编码", required=true, placeholder="角色编码", groups= {IRole.class})
 	@Column(nullable=false, length=30)
 	private String code;
 	
 	@Size(min=5, max=100)
-	@FormMeta(type=FormType.TextArea, label="角色描述", required=true, placeholder="角色描述", groups= {IRole.class})
+	@FormMeta(type=FormType.textarea, label="角色描述", required=true, placeholder="角色描述", groups= {IRole.class})
 	private String description;
 	
 	@Column(nullable=false)
