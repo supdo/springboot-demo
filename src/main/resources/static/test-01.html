@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>登录</title>
+    <meta charset="UTF-8">
+    <title>test Title</title>
     <link rel="stylesheet" charset="utf-8" href="/iview/styles/iview.css" />
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/style.css">
     <style scoped>
         body {
             background-color: #F9F9F9;
+        }
+        [v-cloak] {
+            display: none;
         }
         #loginApp {
             width: 300px;
@@ -21,6 +22,7 @@
     </style>
 </head>
 <body>
+
 <div id="loginApp" v-cloak>
     <card class="loginCard">
         <div slot="title" ><span class="card-title-text">欢迎登陆</span> <span style="float:right;"><a href="/logon">注册</a></span></div>
@@ -52,27 +54,27 @@
 <script type="text/javascript" src="/js/vue.js"></script>
 <script type="text/javascript" src="/iview/iview.js"></script>
 <script type="text/javascript">
-var loginApp = new Vue({
-    el: '#loginApp',
-    data: {
-        formData: {
-            name: '',
-            password: '',
-            verifycode: '',
+    var loginApp = new Vue({
+        el: "#loginApp",
+        data: {
+            formData: {
+                name: '',
+                password: '',
+                verifycode: '',
+            }
+        },
+        methods: {
+            handleSubmit: function(name){
+                this.$refs[name].validate(function(valid){
+                    if (valid) {
+                        this.$Message.success('校验成功!');
+                    } else {
+                        this.$Message.error('校验失败!');
+                    }
+                });
+            }
         }
-    },
-    methods: {
-        handleSubmit: function(name){
-            this.$refs[name].validate(function(valid){
-                if (valid) {
-                    this.$Message.success('校验成功!');
-                } else {
-                    this.$Message.error('校验失败!');
-                }
-            });
-        }
-    }
-});
+    });
 </script>
 </body>
 </html>

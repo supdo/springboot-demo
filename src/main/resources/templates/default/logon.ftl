@@ -1,26 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>注册</title>
-    <link rel="stylesheet" href="/iview/styles/iview.css">
-    <link ref="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" charset="utf-8" href="/iview/styles/iview.css" />
+    <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
     <style scoped>
         body {
             background-color: #F9F9F9;
         }
-        [v-cloak] {
-            display: none;
-        }
         #logonApp {
             width: 400px;
             margin: 150px auto 0 auto;
-        }
-        .card-title-text {
-            font-size: 16px;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -31,8 +24,8 @@
         <div slot="title"><span class="card-title-text">注册</span><span style="float:right;">已有账号请<a href="/login">登录</a>。</span></div>
         <i-form ref="logonForm" :model="formData" :label-width="80">
             <@mf.Hform items=user.fields/>
-            <form-item>
-                <i-button type="primary" @click="handleSubmit('logonForm')">注册</i-button>
+            <form-item class="last-form-item">
+                <i-button type="primary" @click="handleSubmit('logonForm')">提交</i-button>
                 <i-button type="ghost" @click="handleReset('logonForm')" style="margin-left: 8px">重置</i-button>
             </form-item>
         </i-form>
@@ -45,7 +38,9 @@
         el: "#logonApp",
         data: {
             formData: {
-                name: ""
+                <#list user.fields?values as item>
+                ${item.name}: '',
+                </#list>
             }
         },
         methods: {

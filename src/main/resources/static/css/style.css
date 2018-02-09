@@ -1,10 +1,10 @@
-/*
-author: kukei
-date: 2018-02-06
-*/
-
+/*测试*/
 body {
+font-size: 14px;
+}
 
+[v-cloak] {
+    display: none;
 }
 
 .small-input {

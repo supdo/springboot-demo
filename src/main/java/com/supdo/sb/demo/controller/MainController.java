@@ -29,6 +29,11 @@ public class MainController extends BaseController {
 
 	@Autowired
 	SysUserService sysUserService;
+
+	@RequestMapping("test")
+	public String testView(Map<String, Object> map) {
+		return render("test");
+	}
 	
 	//@RequiresAuthentication
 	@RequestMapping({"/", "/default"})
@@ -105,6 +110,16 @@ public class MainController extends BaseController {
 		user.initForm(SysUser.IUser.class);
 		map.put("user", user);
 		return render("logon");
+	}
+
+	@GetMapping("/logon_json")
+	@ResponseBody
+	public Result logonView(Map<String, Object> map) throws Exception {
+		SysUser user = new SysUser();
+		user.initForm(SysUser.IUser.class);
+		this.result.simple(true, "");
+		this.result.putItems("user", user);
+		return result;
 	}
 
 	@RequestMapping(path="/logout")
