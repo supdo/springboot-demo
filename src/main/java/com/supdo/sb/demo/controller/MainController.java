@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -67,6 +68,37 @@ public class MainController extends BaseController {
 			map.put("user", userForm);
 			return "login";
 		}
+	}
+
+	@PostMapping(path="/login.api")
+	@ResponseBody
+	public Result loginApi(@Validated(SysUser.IUserLogin.class) SysUser userForm, BindingResult bindingResult,
+						   HttpServletRequest request, HttpSession session){
+		result.simple(true, "初始化");
+		userForm.initForm(SysUser.IUserLogin.class);
+		String verifycode=request.getParameter("verifycode");
+		if (bindingResult.hasErrors()) {
+			userForm.initFieldErrors(bindingResult);
+			result.simple(false, "字段验证失败");
+		}
+		if(!verifycode.equals(session.getAttribute("VerifyCode"))) {
+			result.simple(false&result.isFlag(), result.getMsg()+",验证码不正确");
+			result.putItems("verifycodeError", "验证码不正确!");
+			session.removeAttribute("VerifyCode");
+		}
+		if(result.isFlag()){
+			try {
+				UsernamePasswordToken token = new UsernamePasswordToken(userForm.getUsername(), userForm.getPassword());
+				SecurityUtils.getSubject().login(token);
+				result.simple(true, "登录成功");
+			} catch (Exception e) {
+				System.out.println(e.toString());
+				userForm.getFields().get("password").setError(e.getMessage());
+				result.simple(false, "登录失败");
+			}
+		}
+		result.putItems("user", userForm);
+		return result;
 	}
 	
 	@GetMapping("/login")

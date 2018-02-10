@@ -16,3 +16,30 @@ Vue.component('my-forms', {
         '</div>',
     props: ['items']
 });
+
+function myGet(url, params, success, error){
+    $.ajax({
+        type: "GET",
+        url: url,
+        data: params,
+        dataType: 'json',
+        success: success,
+        error: error
+    });
+};
+
+function myPost(url, params, success, error){
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: params,
+        dataType: 'json',
+        success: success,
+        error: error
+    });
+};
+
+function formItemError(item, error){
+    item.validateMessage = error;
+    item.validateState = 'error';
+}

@@ -71,12 +71,15 @@
         }
     });
 
-    $.get("/logon_json", { name: "John", time: "2pm" },
+    myGet("/logon_json", { name: "John", time: "2pm" },
         function(data){
             var users = data.items.user.fields;
             for(var key in users){
                 myComp.forms.items.push(users[key]);
             }
+        },
+        function(req,textStatus){
+            alert(textStatus);
         }
     );
 </script>
