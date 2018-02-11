@@ -22,6 +22,7 @@
 </head>
 <body>
 <div id="loginApp" v-cloak>
+    <#--<spin>处理中...</spin>-->
     <card class="loginCard">
         <div slot="title" ><span class="card-title-text">欢迎登陆</span> <span style="float:right;"><a href="/logon">注册</a></span></div>
         <i-form ref="loginForm"  :model="formData">
@@ -73,18 +74,17 @@ var loginApp = new Vue({
             var self = this;
             this.$refs[name].validate(function(valid){
                 if (valid) {
-                    //self.$Message.success('校验成功!');
+                    self.$Spin.show();
                     myPost('/login.api', self.formData,
                         function(data){
-                            self.$Message.success(data.msg);
                             if(data.flag){
+                                self.$Message.success(data.msg);
                                 window.location.href="/default";
                             }else{
+                                self.$Message.error(data.msg);
                                 var users = data.items.user.fields;
                                 for(var key in users){
-                                    if(users[key]['error']) {
-                                        formItemError(self.$refs[key], users[key]['error']);
-                                    }
+                                    setFormError(self.$refs[key], users[key]['error']);
                                     // self.$refs[key].validateMessage = users[key]['error'];
                                     // self.$refs[key].validateState = 'error';
 
@@ -93,13 +93,18 @@ var loginApp = new Vue({
                                     //     self.formError[key] = users[key]['error'];
                                     // });
                                 }
-                                if(data.items.verifycodeError){
-                                    formItemError(self.$refs['verifycode'], data.items.verifycodeError);
+                                setFormError(self.$refs['verifycode'], data.items.verifycodeError);
+                                if(!data.items.verifycodeError){
+                                    self.reloadSC();
                                 }
                             }
                         },
                         function(req,textStatus){
                             self.$Message.error(textStatus);
+                        },
+                        function(req,textStatus){
+                            self.$Spin.hide();
+                            //self.$Message.info(textStatus);
                         }
                     );
                 } else {

@@ -47,7 +47,7 @@ public class ShiroConfig {
 		securityManager.setRealm(myShiroRealm());
 		// 自定义缓存实现 使用redis
 		//RedisCacheManager cache = cacheManager();
-		securityManager.setCacheManager(cacheManager());
+		//securityManager.setCacheManager(cacheManager());
 		// 自定义session管理 使用redis
 		securityManager.setSessionManager(SessionManager());
 		return securityManager;
@@ -61,7 +61,7 @@ public class ShiroConfig {
 	
 	/**
 	 * 配置shiro redisManager
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -69,17 +69,17 @@ public class ShiroConfig {
 		RedisManager redisManager = new RedisManager();
 		return redisManager;
 	}
-	
-	/**
-	 * cacheManager 缓存 redis实现
-	 * 
-	 * @return
-	 */
-	public RedisCacheManager cacheManager() {
-		RedisCacheManager redisCacheManager = new RedisCacheManager();
-		redisCacheManager.setRedisManager(redisManager());
-		return redisCacheManager;
-	}
+
+//	/**
+//	 * cacheManager 缓存 redis实现
+//	 *
+//	 * @return
+//	 */
+//	public RedisCacheManager cacheManager() {
+//		RedisCacheManager redisCacheManager = new RedisCacheManager();
+//		redisCacheManager.setRedisManager(redisManager());
+//		return redisCacheManager;
+//	}
 	
 	
 	/**

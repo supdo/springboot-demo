@@ -91,5 +91,8 @@ public class BaseController {
         public void putItems(String key, Object val) {
             this.items.put(key, val);
         }
+        public void removeItem(String key){
+            this.items.remove(key);
+        }
     }
 }

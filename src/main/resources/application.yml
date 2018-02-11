@@ -44,6 +44,9 @@ spring:
   freemarker: 
     request-context-attribute: request
 
+  #session
+  session:
+    store-type: redis
   #redis
   redis:
     host: 127.0.0.1

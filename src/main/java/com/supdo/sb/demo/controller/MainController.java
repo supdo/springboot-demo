@@ -36,7 +36,7 @@ public class MainController extends BaseController {
 		return render("test");
 	}
 	
-	//@RequiresAuthentication
+	@RequiresAuthentication
 	@RequestMapping({"/", "/default"})
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");
@@ -82,10 +82,14 @@ public class MainController extends BaseController {
 			result.simple(false, "字段验证失败");
 		}
 		if(!verifycode.equals(session.getAttribute("VerifyCode"))) {
-			result.simple(false&result.isFlag(), result.getMsg()+",验证码不正确");
+			result.simple(false&result.isFlag(), "验证码不正确");
 			result.putItems("verifycodeError", "验证码不正确!");
-			session.removeAttribute("VerifyCode");
+		}else{
+			result.removeItem("verifycodeError");
+			//验证码正确后更新验证码
+            session.removeAttribute("VerifyCode");
 		}
+
 		if(result.isFlag()){
 			try {
 				UsernamePasswordToken token = new UsernamePasswordToken(userForm.getUsername(), userForm.getPassword());

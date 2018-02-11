@@ -17,29 +17,39 @@ Vue.component('my-forms', {
     props: ['items']
 });
 
-function myGet(url, params, success, error){
+function myGet(url, params, success, error, complete){
     $.ajax({
         type: "GET",
         url: url,
         data: params,
         dataType: 'json',
         success: success,
-        error: error
+        error: error,
+        complete: complete
     });
 };
 
-function myPost(url, params, success, error){
+function myPost(url, params, success, error, complete){
     $.ajax({
         type: "POST",
         url: url,
         data: params,
         dataType: 'json',
         success: success,
-        error: error
+        error: error,
+        complete: complete
     });
 };
 
-function formItemError(item, error){
-    item.validateMessage = error;
-    item.validateState = 'error';
-}
+/*
+给formitem设置错误信息
+ */
+function setFormError(item, error){
+    if(error) {
+        item.validateMessage = error;
+        item.validateState = 'error';
+    }else{
+        item.validateMessage = error;
+        item.validateState = 'success';
+    }
+};

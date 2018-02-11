@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,14 +23,14 @@ public class CommonController extends BaseController {
 	DefaultKaptcha defaultKaptcha; 
 
 	@GetMapping("/VerifyCode")
-	public void defaultKaptcha(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+	public void defaultKaptcha(HttpServletRequest httpServletRequest, HttpSession session, HttpServletResponse httpServletResponse)
 			throws Exception {
 		byte[] captchaChallengeAsJpeg = null;
 		ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
 		try {
 			// 生产验证码字符串并保存到session中
 			String createText = defaultKaptcha.createText();
-			httpServletRequest.getSession().setAttribute("VerifyCode", createText);
+			session.setAttribute("VerifyCode", createText);
 			// 使用生产的验证码字符串返回一个BufferedImage对象并转为byte写入到byte数组中
 			BufferedImage challenge = defaultKaptcha.createImage(createText);
 			ImageIO.write(challenge, "jpg", jpegOutputStream);
