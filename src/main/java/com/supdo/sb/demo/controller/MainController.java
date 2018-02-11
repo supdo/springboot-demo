@@ -159,10 +159,8 @@ public class MainController extends BaseController {
 	}
 
 	@RequestMapping(path="/logout")
-	@ResponseBody
-	public Result logout() {
+	public String logout() {
 		SecurityUtils.getSubject().logout();
-		this.result = new Result(true, "退出成功！");
-		return this.result;
+		return "redirect:default";
 	}
 }

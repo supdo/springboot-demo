@@ -80,10 +80,15 @@
                         <img v-show="!isCollapsed" src="/image/logo.jpg" key="max-logo" class="layout-logo-left" style="width:170px;" />
                         <img v-show="isCollapsed" src="/image/logo-min.jpg" key="min-logo" class="layout-logo-left" style="width:50px;" />
                     </div>
-                    <menu-item name="1-1">
-                        <icon type="ios-navigate"></icon>
-                        <span>Option 1</span>
-                    </menu-item>
+                    <submenu name="1">
+                        <template slot="title">
+                            <icon type="ios-paper"></icon>
+                            权限管理
+                        </template>
+                        <menu-item name="1-1">用户管理</menu-item>
+                        <menu-item name="1-2">角色管理</menu-item>
+                        <menu-item name="1-3">权限管理</menu-item>
+                    </submenu>
                     <menu-item name="1-2">
                         <icon type="search"></icon>
                         <span>Option 2</span>
