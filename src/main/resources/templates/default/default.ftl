@@ -18,14 +18,19 @@
         }
         .layout-header-bar{
             background: #fff;
-            box-shadow: 0 1px 1px rgba(0,0,0,.1);
+            box-shadow: 0 2px 1px 1px rgba(100, 100, 100, 0.1);
         }
         .layout-logo-left{
             width: 90%;
-            height: 30px;
-            background: #5b6270;
             border-radius: 3px;
-            margin: 15px auto;
+            margin: 15px 0 15px 15px;
+        }
+        .collspseIcon{
+            cursor: pointer;
+            margin: 20px 20px 0;
+        }
+        .collspseIcon:hover{
+            color:#18b566;
         }
         .menu-icon{
             transition: all .3s;
@@ -58,37 +63,52 @@
             vertical-align: middle;
             font-size: 22px;
         }
+        .my-content{
+            margin:0px;
+            min-height: 800px;
+            background-color: #EEEEEE;
+        }
     </style>
 </head>
 <body>
 <div id="app" v-cloak>
     <div class="layout">
         <layout>
-            <i-header :style="{padding: 0}" class="layout-header-bar">
-                <icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '20px 20px 0',pointer:'cursor'}" type="navicon-round" size="24"></icon>
-            </i-header>
+            <sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" :style="{width: isCollapsed?'60px':'200px', overflow: isCollapsed ? 'visible' : 'auto'}">
+                <i-menu active-name="1-2" theme="dark" width="auto" :class="menuitemClasses">
+                    <div class="logo-con">
+                        <img v-show="!isCollapsed" src="/image/logo.jpg" key="max-logo" class="layout-logo-left" style="width:170px;" />
+                        <img v-show="isCollapsed" src="/image/logo-min.jpg" key="min-logo" class="layout-logo-left" style="width:50px;" />
+                    </div>
+                    <menu-item name="1-1">
+                        <icon type="ios-navigate"></icon>
+                        <span>Option 1</span>
+                    </menu-item>
+                    <menu-item name="1-2">
+                        <icon type="search"></icon>
+                        <span>Option 2</span>
+                    </menu-item>
+                    <menu-item name="1-3">
+                        <icon type="settings"></icon>
+                        <span>Option 3</span>
+                    </menu-item>
+                </i-menu>
+            </sider>
             <layout>
-                <sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" :style="{width: isCollapsed?'60px':'200px', overflow: isCollapsed ? 'visible' : 'auto'}">
-                    <i-menu active-name="1-2" theme="dark" width="auto" :class="menuitemClasses">
-                        <div class="logo-con">
-                            <img v-show="!isCollapsed" src="/image/logo.jpg" key="max-logo" style="width:190px;" />
-                            <img v-show="isCollapsed" src="/image/logo-min.jpg" key="min-logo" style="width:50px;" />
-                        </div>
-                        <menu-item name="1-1">
-                            <icon type="ios-navigate"></icon>
-                            <span>Option 1</span>
-                        </menu-item>
-                        <menu-item name="1-2">
-                            <icon type="search"></icon>
-                            <span>Option 2</span>
-                        </menu-item>
-                        <menu-item name="1-3">
-                            <icon type="settings"></icon>
-                            <span>Option 3</span>
-                        </menu-item>
-                    </i-menu>
-                </sider>
-                <i-content :style="{margin: '0px', background: '#fff', minHeight: '860px'}">
+                <i-header :style="{padding: 0}" class="layout-header-bar">
+                    <icon @click.native="collapsedSider" :class="rotateIcon" class="collspseIcon" type="navicon-round" size="24"></icon>
+                    <div style="float:right; padding:2px 10px;">
+                        <dropdown style="margin-right:10px;">
+                            <a href="javascript:void(0)">kukei<icon type="arrow-down-b"></icon></a>
+                            <dropdown-menu slot="list">
+                                <dropdown-item>个人中心</dropdown-item>
+                                <dropdown-item><a href="/logout">注销</a></dropdown-item>
+                            </dropdown-menu>
+                        </dropdown>
+                        <Avatar style="background-color: #87d068" icon="person" />
+                    </div>
+                </i-header>
+                <i-content class="my-content">
                     Content
                 </i-content>
             </layout>
