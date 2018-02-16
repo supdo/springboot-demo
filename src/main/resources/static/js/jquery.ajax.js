@@ -150,7 +150,7 @@ jQuery.fn = jQuery.prototype = {
 
 	constructor: jQuery,
 
-	// The default length of a jQuery object is 0
+	// The iview length of a jQuery object is 0
 	length: 0,
 
 	toArray: function() {
@@ -886,7 +886,7 @@ function assert( fn ) {
 	} catch (e) {
 		return false;
 	} finally {
-		// Remove from its parent by default
+		// Remove from its parent by iview
 		if ( el.parentNode ) {
 			el.parentNode.removeChild( el );
 		}
@@ -2015,7 +2015,7 @@ Expr = Sizzle.selectors = {
 		},
 
 		"selected": function( elem ) {
-			// Accessing this property makes selected-by-default
+			// Accessing this property makes selected-by-iview
 			// options in Safari work properly
 			if ( elem.parentNode ) {
 				elem.parentNode.selectedIndex;
@@ -2693,7 +2693,7 @@ support.sortStable = expando.split("").sort( sortOrder ).join("") === expando;
 // Always assume duplicates if they aren't passed to the comparison function
 support.detectDuplicates = !!hasDuplicate;
 
-// Initialize against the default document
+// Initialize against the iview document
 setDocument();
 
 // Support: Webkit<537.32 - Safari 6.0.3/Chrome 25 (fixed in Chrome 27)
@@ -2911,7 +2911,7 @@ function createOptions( options ) {
  *	options: an optional list of space-separated options that will change how
  *			the callback list behaves or a more traditional option object
  *
- * By default a callback list will act like an event callback list and can be
+ * By iview a callback list will act like an event callback list and can be
  * "fired" multiple times.
  *
  * Possible options:
@@ -3512,7 +3512,7 @@ jQuery.extend( {
 
 
 // These usually indicate a programmer mistake during development,
-// warn about them ASAP rather than swallowing them by default.
+// warn about them ASAP rather than swallowing them by iview.
 var rerrorNames = /^(Eval|Internal|Range|Reference|Syntax|Type|URI)Error$/;
 
 jQuery.Deferred.exceptionHook = function( error, stack ) {
@@ -3974,7 +3974,7 @@ function fixInput( src, dest ) {
 	if ( nodeName === "input" && rcheckableType.test( src.type ) ) {
 		dest.checked = src.checked;
 
-	// Fails to return the selected option to the default selected state when cloning options
+	// Fails to return the selected option to the iview selected state when cloning options
 	} else if ( nodeName === "input" || nodeName === "textarea" ) {
 		dest.defaultValue = src.defaultValue;
 	}

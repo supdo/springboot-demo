@@ -25,6 +25,7 @@
         }
         .layout-header-bar {
             height: 60px;
+            padding: 0px;
             background: #fff;
             box-shadow: 0 2px 1px 1px rgba(100, 100, 100, 0.1);
         }
@@ -34,9 +35,8 @@
             margin: 15px 0 15px 15px;
         }
         .my-content {
-            margin: 0px;
+            margin: 8px 6px;
             min-height: 800px;
-            background-color: #EEEEEE;
         }
     </style>
 </head>
@@ -48,17 +48,17 @@
                 <div class="logo-con">
                     <img src="/image/logo.jpg" key="max-logo" class="layout-logo-left"/>
                 </div>
-                <i-menu ref="siderMenu" theme="dark" width="auto" >
-                    <menu-item v-for="(item,index) in siderMenu" :name="index" :key="'menuitem'+item.name">
-                        <icon type="search"></icon>
+                <i-menu ref="siderMenu" theme="dark" width="auto" :active-name="0">
+                    <menu-item v-for="(item,index) in siderMenu" :name="index" :key="'siderMenu-'+item.name" style="padding: 12px 24px;">
+                        <Icon type="document-text"></Icon>
                         <span>{{item.title}}</span>
                     </menu-item>
                 </i-menu>
             </sider>
             <layout>
-                <i-header :style="{padding: 0}" class="layout-header-bar">
-                    <i-menu ref="headerMenu" mode="horizontal" theme="light" active-name="home" @on-select="initSiderMenu">
-                        <menu-item v-for="(item,index) in menuList" :name="index" :key="'headerMenu-'+item.name" >
+                <i-header class="layout-header-bar">
+                    <i-menu ref="headerMenu" mode="horizontal" theme="light" :active-name="0" @on-select="initSiderMenu">
+                        <menu-item v-for="(item,index) in menuList" :name="index" :key="'headerMenu-'+item.name" style="font-size: 16px;">
                             <icon type="ios-paper"></icon>
                             {{item.title}}
                         </menu-item>
@@ -77,14 +77,23 @@
                     </i-menu>
                 </i-header>
                 <i-content class="my-content">
-                    Content
+                    <template>
+                    <tabs ref="headerTabs">
+                        <#--<tab-pane v-for="(tab, index) in contentTabs" :key="index" :name="'headerTab-'+index" :label="tab.title" closable>-->
+                            <#--<iframe id="tab-ifr-" :src="tab.url" frameborder="0" scrolling="no"></iframe>-->
+                        <#--</tab-pane>-->
+                        <tab-pane>
+                            test
+                        </tab-pane>
+                    </tabs>
+                    </template>
                 </i-content>
             </layout>
         </layout>
     </div>
 </div>
 <script type="text/javascript" src="/js/vue.js"></script>
-<script type="text/javascript" src="/iview/iview.js"></script>
+<script type="text/javascript" src="/iview/iview.min.js"></script>
 <script type="text/javascript">
     var app = new Vue({
         el: '#app',
@@ -102,6 +111,11 @@
                 }
             ],
             siderMenu: [
+            ],
+            contentTabs: [
+                {name: 'User', icon: '', title: '用户管理1', url: '/iview'},
+                {name: 'User', icon: '', title: '用户管理2', url: '/login'},
+                {name: 'User', icon: '', title: '用户管理3', url: '/logon'}
             ]
         },
         computed: {

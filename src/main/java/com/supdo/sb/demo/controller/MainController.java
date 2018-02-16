@@ -41,7 +41,7 @@ public class MainController extends BaseController {
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");
 		//map.put("test", "test");
-		return render("default");
+		return render("iview");
 	}
 	
 	@PostMapping("/login")
