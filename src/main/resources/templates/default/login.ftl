@@ -8,12 +8,6 @@
     <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
     <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
     <style type="text/css">
-        body {
-            margin: 0px;
-        }
-        [v-cloak] {
-            display: none;
-        }
         #loginApp {
             width: 400px;
             margin: 150px auto 0 auto;
@@ -24,26 +18,20 @@
 <div id="loginApp" v-cloak>
     <el-card class="loginCard">
         <div slot="header" ><span class="card-title-text">欢迎登陆</span> <span style="float:right;"><a href="/logon">注册</a></span></div>
-        <el-form ref="loginForm"  :model="formData">
-            <el-form-item ref="username" prop="username" :error="formError.username" :rules="{required: true, message: '用户名不能为空', trigger: 'blur'}">
-                <el-input type="text" v-model="formData.username" placeholder="用户名">
-                    <i class="el-icon-document" size="18" slot="prepend"></i>
-                </el-input>
+        <el-form ref="loginForm"  :model="formData" label-width="80px">
+            <el-form-item ref="username" prop="username" label="用户名" :error="formError.username" :rules="{required: true, message: '用户名不能为空', trigger: 'blur'}">
+                <el-input type="text" v-model="formData.username" placeholder="用户名"></el-input>
             </el-form-item>
-            <el-form-item ref="password"  prop="password" :error="formError.password" :rules="{required: true, message: '密码不能为空', trigger: 'blur'}">
-                <el-input type="password" v-model="formData.password" placeholder="密码">
-                    <i class="el-icon-document" size="18" slot="prepend"></i>
-                </el-input>
+            <el-form-item ref="password"  prop="password" label="密码" :error="formError.password" :rules="{required: true, message: '密码不能为空', trigger: 'blur'}">
+                <el-input type="password" v-model="formData.password" placeholder="密码"></el-input>
             </el-form-item>
             <el-row>
                 <el-col :span="12">
-                    <el-form-item ref="verifycode" prop="verifycode" :error="formError.verifycode" :rules="{required: true, message: '验证码不能为空', trigger: 'blur'}">
-                        <el-input type="text" v-model="formData.verifycode" placeholder="验证码" >
-                            <i class="el-icon-document" size="18" slot="prepend"></i>
-                        </el-input>
+                    <el-form-item ref="verifycode" prop="verifycode" label="验证码" :error="formError.verifycode" :rules="{required: true, message: '验证码不能为空', trigger: 'blur'}">
+                        <el-input type="text" v-model="formData.verifycode" placeholder="验证码" ></el-input>
                     </el-form-item>
                 </el-col>
-                <el-col :span="12"><img id="VCImg" style="height:38px; margin:2px 0 0 5px;cursor:pointer;" @click="reloadSC" :src="scUrl" title="点击刷新验证码！"></el-col>
+                <el-col :span="12"><img id="VCImg" style="height:38px; margin:1px 0 0 5px;cursor:pointer;" @click="reloadSC" :src="scUrl" title="点击刷新验证码！"></el-col>
             </el-row>
             <el-form-item class="last-form-item">
                 <el-button type="primary" style="width:100%" @click="handleSubmit('loginForm')">登录</el-button>
