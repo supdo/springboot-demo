@@ -60,45 +60,45 @@
         },
         methods: {
             handleSubmit: function(name){
-                var self = this;
+                var $this = this;
                 this.$refs[name].clearValidate();
                 this.$refs[name].validate(function(valid){
                    if (valid) {
-                        //self.$Spin.show();
-                        myPost('/login.api', self.formData,
+                        //$this.$Spin.show();
+                        myPost('/login.api', $this.formData,
                                 function(data){
                                     if(data.flag){
-                                        self.$message.success(data.msg);
+                                        $this.$message.success(data.msg);
                                         window.location.href="/default";
                                     }else{
-                                        self.$message.error(data.msg);
+                                        $this.$message.error(data.msg);
                                         var users = data.items.user.fields;
                                         for(var key in users) {
-                                            self.$refs[key].error = null;
-                                            self.$nextTick(function() {
-                                                self.$refs[key].error = users[key]['error'];
+                                            $this.$refs[key].error = null;
+                                            $this.$nextTick(function() {
+                                                $this.$refs[key].error = users[key]['error'];
                                             });
                                         }
-                                        self.$refs['verifycode'].error = null;
-                                        self.$nextTick(function() {
-                                            self.$refs['verifycode'].error = data.items.verifycodeError;
+                                        $this.$refs['verifycode'].error = null;
+                                        $this.$nextTick(function() {
+                                            $this.$refs['verifycode'].error = data.items.verifycodeError;
                                         });
 
                                         if(!data.items.verifycodeError){
-                                            self.reloadSC();
+                                            $this.reloadSC();
                                         }
                                     }
                                 },
                                 function(req,textStatus){
-                                    self.$message.error(textStatus);
+                                    $this.$message.error(textStatus);
                                 },
                                 function(req,textStatus){
-                                    //self.$Spin.hide();
-                                    //self.$Message.info(textStatus);
+                                    //$this.$Spin.hide();
+                                    //$this.$Message.info(textStatus);
                                 }
                         );
                     } else {
-                        self.$message.error('校验失败!');
+                        $this.$message.error('校验失败!');
                     }
                 });
             },
