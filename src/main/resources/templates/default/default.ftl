@@ -6,21 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Default</title>
     <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/iconfont/iconfont.css">
     <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
     <style type="text/css">
+        body {
+        }
+        html {
+        }
+        .app-header-fullicon {
+            z-index: 9999;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 55px;
+            text-align: center;
+            line-height: 55px;
+            padding: 0px 0px;
+        }
+        .app-header-fullicon i {
+            font-size: 28px;
+            cursor: pointer;
+            color: #888888;
+            -webkit-transition: font-size 0.25s ease-out 0s;
+            -moz-transition: font-size 0.25s ease-out 0s;
+            transition: font-size 0.25s ease-out 0s;
+        }
+        .app-header-fullicon i:hover {
+            font-size: 36px;
+        }
+        .hide {
+            display: none;
+        }
         #app {
-
         }
         .app-aside {
             background-color: rgb(84, 92, 100);
             overflow: hidden;
             border-right: solid 1px #e6e6e6;
+            width: 202px;
+        }
+        .app-aside-min {
+            width: 62px;
         }
         .app-logo {
             border-right: solid 0px #e6e6e6;
         }
         .app-logo-img {
             width: 170px;
+            margin: 5px 0px 0px 15px;
+        }
+        .app-logo-img-min {
+            width: 60px;
             margin: 5px 0px 0px 15px;
         }
         .app-aside-menu
@@ -37,15 +73,19 @@
         .el-menu--horizontal{
             border-width: 0px;
         }
+        .el-menu--horizontal>.el-menu-item {
+            font-size: 16px;
+        }
         .app-header-right {
             float: right;
-            margin-top:20px;
+            line-height: 55px;
             outline: none;
+            margin-right: 40px;
             padding: 0px 15px;
             cursor: pointer;
         }
         .app-main {
-            padding: 10px 10px 0 10px;
+            padding: 10px 6px 0 6px;
         }
         .el-tabs__header {
             margin-bottom: 0px;
@@ -59,21 +99,21 @@
 </head>
 <body>
 <div id="app" v-cloak>
+    <div class="app-header-fullicon">
+        <i class="iconfont" :class="{'icon-fullscreen': !fullScreen, 'icon-exit-fullscreen': fullScreen}" @click="handleFullScreen"></i>
+    </div>
     <el-container>
-        <el-aside class="app-aside" style="width:202px;">
-            <div class="app-logo"><img src="/image/logo.jpg" class="app-logo-img" /></div>
-            <el-menu ref="asideMenu" default-active="0" class="app-aside-menu" @select="asideSelect" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
-                <template v-for="(menu,key,index) in asideMenu">
-                    <el-menu-item  :index="key" :key="'asideMenu-'+key">
-                        <i class="el-icon-document"></i>
-                        <span slot="title">{{menu.title}}</span>
-                    </el-menu-item>
-                </template>
-
+        <el-aside class="app-aside" :width="(fullScreen ? 62 : 202) + 'px'">
+            <div class="app-logo"><img src="/image/logo.jpg" :class="{'app-logo-img': !fullScreen, 'app-logo-img-min': fullScreen}" /></div>
+            <el-menu ref="asideMenu" default-active="0" class="app-aside-menu" :collapse="fullScreen" @select="asideSelect" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+                <el-menu-item v-for="(menu,key,index) in asideMenu" :index="key" :key="'asideMenu-'+key">
+                    <i class="el-icon-document"></i>
+                    <span slot="title">{{menu.title}}</span>
+                </el-menu-item>
             </el-menu>
         </el-aside>
         <el-container>
-            <el-header class="app-header">
+            <el-header class="app-header" :class="{hide: fullScreen}">
                 <el-menu ref="headerMenu" default-active="0" class="" mode="horizontal" @select="initAsideMenu">
                     <el-menu-item v-for="(menu,key) in menus" :index="key" :key="'headerMenu-'+key">{{menu.title}}</el-menu-item>
                     <div class="app-header-right">
@@ -88,9 +128,9 @@
                 </el-menu>
             </el-header>
             <el-main class="app-main">
-                <el-tabs ref="headerTabs" type="card" value="1" closable  @tab-remove="removeHeaderTab">
-                    <el-tab-pane v-for="(tab,key,index) in headerTabs" :key="key" :label="tab.title" :name="key">
-                        <iframe :src="tab.url" width="100%" frameborder="0" scrolling="no"></iframe>
+                <el-tabs ref="headerTabs" type="card" value="1" @tab-remove="removeHeaderTab">
+                    <el-tab-pane v-for="(tab,key,index) in headerTabs" :key="key" :label="tab.title" :name="key" :closable="key != homeIndex">
+                        <iframe :src="tab.url" width="100%" :height="ifrHeight" frameborder="0"></iframe>
                     </el-tab-pane>
                 </el-tabs>
             </el-main>
@@ -120,27 +160,37 @@
             //                 ]
             //     }
             // ],
+            fullScreen: false,
+            homeIndex: 'home',
             menus: {
                 home: {
                     title: '首页', icon: '', children: {
-                        home: {title: '首页', icon: '', url: '//baidu.com'}
+                        home: {title: '首页', icon: '', url: '/test-02.html'}
                     }
                 },
                 system: {
                     title: '系统管理', icon: '', children: {
-                        user: {title: '用户管理', icon: '', url: '/default'},
+                        user: {title: '用户管理', icon: '', url: '//163.com'},
                         role: {title: '角色管理', icon: '', url: '//qq.com'},
-                        permission: {title: '权限管理', icon: '', url: ''}
+                        permission: {title: '权限管理', icon: '', url: '//jd.com'}
                     }
                 }
             },
             asideMenu: {},
-            headerTabs: {}
+            headerTabs: {},
+            ifrHeight: 600
         },
         methods: {
             init: function(){
                 this.initAsideMenu('home');
-
+                this.initIfrHeight();
+            },
+            handleFullScreen: function(){
+                this.fullScreen = !this.fullScreen;
+                this.initIfrHeight();
+            },
+            initIfrHeight: function(){
+                this.ifrHeight = this.fullScreen ? document.documentElement.clientHeight - 56 : this.ifrHeight = document.documentElement.clientHeight - 116;
             },
             initAsideMenu: function(index){
                 var $this = this, asideIndex;
@@ -159,7 +209,13 @@
                 });
             },
             removeHeaderTab: function(targetName){
-                this.$delete(this.headerTabs, targetName);
+                var $this = this;
+                if(targetName != this.homeIndex){
+                    this.$delete(this.headerTabs, targetName);
+                    this.$nextTick(function(){
+                        $this.$refs.headerTabs.currentName = $this.homeIndex;
+                    });
+                }
             }
         },
         mounted: function(){
