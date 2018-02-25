@@ -2,7 +2,13 @@ server:
   compression:
     enabled: true
 
-spring: 
+spring:
+  #静态资源的配置
+  resources:
+    cache-period: 10000
+    chain:
+      gzipped: true
+      cache: true
   #mvc: 
     #static-path-pattern: /**
     #view: 
