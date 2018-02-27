@@ -39,6 +39,7 @@
         </el-form>
     </el-card>
 </div>
+<script type="text/javascript" src="/js/jquery.ajax.js"></script>
 <script type="text/javascript" src="/js/vue.min.js"></script>
 <script type="text/javascript" src="/element/element-ui.min.js"></script>
 <script type="text/javascript" src="/js/common.js"></script>

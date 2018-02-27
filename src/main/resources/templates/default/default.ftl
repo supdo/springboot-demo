@@ -170,7 +170,7 @@
                 },
                 system: {
                     title: '系统管理', icon: '', children: {
-                        user: {title: '用户管理', icon: '', url: '//163.com'},
+                        user: {title: '用户管理', icon: '', url: '/user/list'},
                         role: {title: '角色管理', icon: '', url: '//qq.com'},
                         permission: {title: '权限管理', icon: '', url: '//jd.com'}
                     }
