@@ -20,7 +20,7 @@
             right: 0px;
             width: 55px;
             text-align: center;
-            line-height: 55px;
+            line-height: 48px;
             padding: 0px 0px;
         }
         .app-header-fullicon i {
@@ -65,6 +65,7 @@
         }
         .app-header {
             margin: 0px;
+            margin-bottom: 4px;
             padding: 0px;
             -moz-box-shadow:0px 2px 5px #BBBBBB;
             -webkit-box-shadow:0px 2px 5px #BBBBBB;
@@ -75,20 +76,30 @@
         }
         .el-menu--horizontal>.el-menu-item {
             font-size: 16px;
+            height: 50px;
+            line-height: 50px;
+        }
+        .el-menu-item, .el-submenu__title {
+            height: 46px;
+            line-height: 46px;
         }
         .app-header-right {
             float: right;
-            line-height: 55px;
+            line-height: 50px;
             outline: none;
             margin-right: 40px;
             padding: 0px 15px;
             cursor: pointer;
         }
         .app-main {
-            padding: 10px 6px 0 6px;
+            padding: 6px 0px 0 6px;
         }
         .el-tabs__header {
             margin-bottom: 0px;
+        }
+        .el-tabs__item {
+            height:36px;
+            line-height: 36px;
         }
         .el-tabs__content{
             border: 1px solid #e4e7ed;
@@ -113,8 +124,8 @@
             </el-menu>
         </el-aside>
         <el-container>
-            <el-header class="app-header" :class="{hide: fullScreen}">
-                <el-menu ref="headerMenu" default-active="0" class="" mode="horizontal" @select="initAsideMenu">
+            <el-header class="app-header" :class="{hide: fullScreen}" height="50px">
+                <el-menu ref="headerMenu" default-active="home" class="" mode="horizontal" @select="initAsideMenu">
                     <el-menu-item v-for="(menu,key) in menus" :index="key" :key="'headerMenu-'+key">{{menu.title}}</el-menu-item>
                     <div class="app-header-right">
                         <el-dropdown>
@@ -190,7 +201,8 @@
                 this.initIfrHeight();
             },
             initIfrHeight: function(){
-                this.ifrHeight = this.fullScreen ? document.documentElement.clientHeight - 56 : this.ifrHeight = document.documentElement.clientHeight - 116;
+                //this.ifrHeight = this.fullScreen ? document.documentElement.clientHeight - 56 : document.documentElement.clientHeight - 116;
+                this.ifrHeight = document.documentElement.clientHeight - (this.fullScreen ? 48 : 103);
             },
             initAsideMenu: function(index){
                 var $this = this, asideIndex;
