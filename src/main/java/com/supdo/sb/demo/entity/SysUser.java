@@ -43,7 +43,7 @@ public class SysUser extends BaseEntity implements Serializable{
 	@Column(nullable=false)
 	private String password;
 	
-    @Size(min=3, max=30, groups={IUser.class})
+    @Size(min=5, max=30, groups={IUser.class})
     @Transient
     @FormMeta(type=FormType.password, label="确认密码", required=true, placeholder="确认密码", groups= {IUser.class})
     private String rePassword;

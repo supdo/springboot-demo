@@ -79,16 +79,18 @@
             },
             handleEdit: function(index){
                 this.initAddUserDlg(index, '编辑用户');
+                //this.$refs.addUserForm.clearValidate();
             },
             handleDelete: function(index){
                 this.listData.splice(index, 1);
             },
             handleAdd: function() {
                 this.initAddUserDlg(-1, '添加用户');
+                //this.$refs.addUserForm.clearValidate();
             },
             addUser: function(){
                 var $this = this;
-                //this.$refs.addUserForm.clearValidate();
+                this.$refs.addUserForm.clearValidate();
                 this.$refs.addUserForm.validate(function(valid) {
                     if (valid) {
                         $this.addUserDlg.okBtnLoading = true;
@@ -96,17 +98,15 @@
                                 function(data){
                                     if(data.flag){
                                         $this.$message.success(data.msg);
-                                        this.addUserDlg.visible = false;
+                                        $this.addUserDlg.visible = false;
                                     }else{
                                         $this.$message.error(data.msg);
                                         var users = data.items.user.fields;
-                                        for(var key in users) {
-                                            $this.$refs['userFormError_' + key].error = null;
-                                            //$this.$refs['userFormError_' + key].error = users[key]['error'];
-                                            $this.$nextTick(function() {
+                                        $this.$nextTick(function() {
+                                            for(var key in users) {
                                                 $this.$refs['userFormError_' + key].error = users[key]['error'];
-                                            });
-                                        }
+                                            }
+                                        });
                                     }
                                 },
                                 function(req, textStatus){

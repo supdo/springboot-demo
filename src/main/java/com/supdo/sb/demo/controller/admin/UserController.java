@@ -43,8 +43,14 @@ public class UserController extends BaseController {
             this.result.simple(false, "校验失败！");
             this.result.putItems("user", userForm.initFieldErrors(bindingResult));
         }else {
-            sysUserService.save(userForm);
-            this.result.simple(true, "保存成功！");
+            List<SysUser> userList = sysUserService.getListByUsername(userForm.getUsername());
+            if (userList.size() > 0) {
+                this.result.simple(false, "用户名已存在！");
+                userForm.getFields().get("username").setError("用户名已存在！");
+            }else {
+                sysUserService.save(userForm);
+                this.result.simple(true, "保存成功！");
+            }
             this.result.putItems("user", userForm);
         }
         return result;
