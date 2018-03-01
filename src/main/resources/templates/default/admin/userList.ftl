@@ -20,7 +20,11 @@
 <#import "/default/lib/form.ftl" as mf>
 <div id="userList" v-cloak>
     <el-button @click="handleAdd()" type="primary" size="mini">添加新用户</el-button>
-    <el-table :data="listData" border style="width: 100%" size="small">
+    <el-table :data="listData" border style="width: 100%" size="small"
+              v-loading="tableLoading"
+              element-loading-text="数据处理中..."
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(0, 0, 0, 0.8)">
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="username" label="姓名" width="180"></el-table-column>
         <el-table-column prop="nickname" label="昵称"></el-table-column>
@@ -56,6 +60,7 @@
                 { id: '${user.id}', username: '${user.username}', nickname: '${user.nickname}' }<#sep>,</#sep>
             </#list>
             ],
+            tableLoading: false,
             addUserDlg: {
                 visible: false,
                 title: '添加用户',
@@ -82,7 +87,19 @@
                 //this.$refs.addUserForm.clearValidate();
             },
             handleDelete: function(index){
-                this.listData.splice(index, 1);
+                var $this = this;
+                this.tableLoading = true;
+                myPost('/user/delete/'+this.listData[index].id, {},
+                        function(data){
+                            if(data.flag) {
+                                $this.listData.splice(index, 1);
+                                $this.$message.success(data.msg);
+                            }else{
+                                $this.$message.error(data.msg);
+                            }
+                            $this.tableLoading = false;
+                        }
+                );
             },
             handleAdd: function() {
                 this.initAddUserDlg(-1, '添加用户');
@@ -99,6 +116,7 @@
                                     if(data.flag){
                                         $this.$message.success(data.msg);
                                         $this.addUserDlg.visible = false;
+                                        $this.listData.unshift(data.items.newObj);
                                     }else{
                                         $this.$message.error(data.msg);
                                         var users = data.items.user.fields;

@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,16 +40,32 @@ public class UserController extends BaseController {
             this.result.simple(false, "校验失败！");
             this.result.putItems("user", userForm.initFieldErrors(bindingResult));
         }else {
-            List<SysUser> userList = sysUserService.getListByUsername(userForm.getUsername());
-            if (userList.size() > 0) {
-                this.result.simple(false, "用户名已存在！");
-                userForm.getFields().get("username").setError("用户名已存在！");
-            }else {
-                sysUserService.save(userForm);
+            if(userForm.getId() == null){   //新增
+                if(sysUserService.getListByUsername(userForm.getUsername()).size() > 0){
+                    this.result.simple(false, "用户名已存在！");
+                    userForm.getFields().get("username").setError("用户名已存在！");
+                }else {
+                    SysUser newObj = sysUserService.save(userForm);
+                    this.result.simple(true, "保存成功！");
+                    this.result.putItems("newObj", newObj);
+                }
+            }else { //更新
+                SysUser user = sysUserService.findOne(userForm.getId());
+                user.merge(userForm);
+                SysUser newObj = sysUserService.save(user);
                 this.result.simple(true, "保存成功！");
+                this.result.putItems("newObj", newObj);
             }
             this.result.putItems("user", userForm);
         }
+        return result;
+    }
+
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    public Result delete(@PathVariable Long id) {
+        sysUserService.delete(id);
+        this.result.simple(true, "删除成功！");
         return result;
     }
 }

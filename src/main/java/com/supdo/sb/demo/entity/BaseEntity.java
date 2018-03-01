@@ -1,8 +1,10 @@
 package com.supdo.sb.demo.entity;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -44,6 +46,45 @@ public class BaseEntity {
 	
 	public BaseEntity initForm() {
 		return this.initForm(null);
+	}
+
+	/**
+	 * 合并两个实例的属性，如果source的属性为不为null，则替换近this的对应属性。
+	 * @param source 需要合并进来的属性对象
+	 * @return
+	 */
+	public BaseEntity merge(BaseEntity source){
+		Field[] myFields =  this.getClass().getDeclaredFields();
+		//List<String> names = Arrays.asList(exclude);
+//		Field[] sourceFields =  source.getClass().getDeclaredFields();
+//		for(int i=0; i<myFields.length; i++){
+//			Field myField = sourceFields[i];
+//			Field sourceField = sourceFields[i];
+//			myField.setAccessible(true);
+//			sourceField.setAccessible(true);
+//			try {
+//				if(sourceField.get(source) != null){
+//					myField.set(this, sourceField.get(source));
+//                }
+//			} catch (IllegalAccessException e) {
+//				e.printStackTrace();
+//			}
+//		}
+
+		for (Field field : myFields) {
+			String name = field.getName();
+			field.setAccessible(true);
+			try {
+				if(!Modifier.isStatic(field.getModifiers())
+						&& !Modifier.isFinal(field.getModifiers())
+						&& field.get(source) != null ){
+					field.set(this, field.get(source));
+				}
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		return this;
 	}
 	
 	/**

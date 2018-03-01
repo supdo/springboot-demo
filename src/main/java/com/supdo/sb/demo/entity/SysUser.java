@@ -31,7 +31,7 @@ public class SysUser extends BaseEntity implements Serializable{
 
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+    private Long id = -1L;
 	
 	@Size(min=5, max=30, groups={IUser.class, IUserLogin.class})
 	@FormMeta(label="用户名", required=true, placeholder="用户名", groups= {IUser.class, IUserLogin.class})
