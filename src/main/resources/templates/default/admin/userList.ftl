@@ -28,9 +28,10 @@
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="username" label="姓名" width="180"></el-table-column>
         <el-table-column prop="nickname" label="昵称"></el-table-column>
-        <el-table-column label="操作" width="180">
+        <el-table-column label="操作" width="220">
             <template slot-scope="scope">
                 <el-button @click="handleEdit(scope.$index)" type="primary" size="mini">编辑</el-button>
+                <el-button @click="handleRole(scope.$index)" type="primary" size="mini">角色</el-button>
                 <el-button @click="handleDelete(scope.$index)" type="danger" size="mini">删除</el-button>
             </template>
         </el-table-column>
@@ -42,6 +43,15 @@
         <div slot="footer" class="dialog-footer">
             <el-button @click="addUserDlg.visible = false" size="small">取 消</el-button>
             <el-button :loading="addUserDlg.okBtnLoading" type="primary" @click="addUser()" size="small">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
+        <el-checkbox-group v-model="myRoles">
+            <el-checkbox v-for="role in roleList" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
+        </el-checkbox-group>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="roleDlg.visible = false" size="small">取 消</el-button>
+            <el-button :loading="roleDlg.okBtnLoading" type="primary" @click="setRoles()" size="small">确 定</el-button>
         </div>
     </el-dialog>
 </div>
@@ -56,9 +66,9 @@
         el: '#userList',
         data: {
             listData: [
-            <#list users as user>
-                { id: '${user.id}', username: '${user.username}', nickname: '${user.nickname}' }<#sep>,</#sep>
-            </#list>
+                <#list users as user>
+                    { id: '${user.id}', username: '${user.username}', nickname: '${user.nickname}', myRoles: [<#list user.roleList![] as role>'${role.id}'</#list><#sep>,</#sep>] }<#sep>,</#sep>
+                </#list>
             ],
             tableLoading: false,
             addUserDlg: {
@@ -68,7 +78,18 @@
             },
             userModel: {id:'', username:'', password: '', rePassword: '', nickname: ''},
             userFormError: {},
-            userForm: {}
+            userForm: {},
+            roleDlg: {
+                visible: false,
+                title: '选择角色',
+                okBtnLoading: false
+            },
+            roleList: [
+                <#list roleList as role>
+                    {id: '${role.id}', code: '${role.code}', name: '${role.name}'}<#sep>,</#sep>
+                </#list>
+            ],
+            myRoles: []
         },
         methods: {
             initAddUserDlg: function(index, title) {
@@ -136,6 +157,13 @@
                         );
                     }
                 });
+            },
+            handleRole: function(index){
+                this.roleDlg.visible = true;
+                this.myRoles = JSON.parse(JSON.stringify(this.listData[index].myRoles));
+            },
+            setRoles: function(){
+                var $this = this;
             }
         }
     });

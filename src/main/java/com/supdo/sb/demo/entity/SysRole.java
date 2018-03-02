@@ -2,6 +2,8 @@ package com.supdo.sb.demo.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,7 +57,20 @@ public class SysRole extends BaseEntity implements Serializable {
     	joinColumns = {@JoinColumn(name = "role_id", referencedColumnName ="id") }, 
     	inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName ="id") }
     )
-    private List<SysPermission> permissionList;
+    private Set<SysPermission> permissionList;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SysRole sysRole = (SysRole) o;
+		return Objects.equals(id, sysRole.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	public interface IRole {}
 	
@@ -118,11 +133,11 @@ public class SysRole extends BaseEntity implements Serializable {
 		this.userList = userList;
 	}
 
-	public List<SysPermission> getPermissionList() {
+	public Set<SysPermission> getPermissionList() {
 		return permissionList;
 	}
 
-	public void setPermissionList(List<SysPermission> permissionList) {
+	public void setPermissionList(Set<SysPermission> permissionList) {
 		this.permissionList = permissionList;
 	}
 	

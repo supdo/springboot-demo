@@ -3,6 +3,7 @@ package com.supdo.sb.demo.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +32,7 @@ public class SysUser extends BaseEntity implements Serializable{
 
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id = -1L;
+    private Long id;
 	
 	@Size(min=5, max=30, groups={IUser.class, IUserLogin.class})
 	@FormMeta(label="用户名", required=true, placeholder="用户名", groups= {IUser.class, IUserLogin.class})
@@ -76,16 +77,7 @@ public class SysUser extends BaseEntity implements Serializable{
     	joinColumns = {@JoinColumn(name = "user_id", referencedColumnName ="id") }, 
     	inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName ="id") }
     )
-    private List<SysRole> roleList;
-	
-	
-    public List<SysRole> getRoleList() {
-		return roleList;
-	}
-
-	public void setRoleList(List<SysRole> roleList) {
-		this.roleList = roleList;
-	}
+    private Set<SysRole> roleList;
 
 	public interface IUser {}
     public interface IUserLogin {}
@@ -168,5 +160,13 @@ public class SysUser extends BaseEntity implements Serializable{
 
 	public void setLastUpdateTime(Timestamp lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
+	}
+
+	public Set<SysRole> getRoleList() {
+		return roleList;
+	}
+
+	public void setRoleList(Set<SysRole> roleList) {
+		this.roleList = roleList;
 	}
 }
