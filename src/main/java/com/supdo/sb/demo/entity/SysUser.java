@@ -2,7 +2,6 @@ package com.supdo.sb.demo.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -14,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
@@ -72,12 +70,12 @@ public class SysUser extends BaseEntity implements Serializable{
 	@Column(name="last_update_time")
 	private Timestamp lastUpdateTime;
 	
-	@ManyToMany(fetch= FetchType.LAZY)
+	@ManyToMany(fetch= FetchType.EAGER)
     @JoinTable(name = "sys_user_role", 
     	joinColumns = {@JoinColumn(name = "user_id", referencedColumnName ="id") }, 
     	inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName ="id") }
     )
-    private Set<SysRole> roleList;
+    private Set<SysRole> roleSet;
 
 	public interface IUser {}
     public interface IUserLogin {}
@@ -162,11 +160,11 @@ public class SysUser extends BaseEntity implements Serializable{
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
-	public Set<SysRole> getRoleList() {
-		return roleList;
+	public Set<SysRole> getRoleSet() {
+		return roleSet;
 	}
 
-	public void setRoleList(Set<SysRole> roleList) {
-		this.roleList = roleList;
+	public void setRoleSet(Set<SysRole> roleSet) {
+		this.roleSet = roleSet;
 	}
 }

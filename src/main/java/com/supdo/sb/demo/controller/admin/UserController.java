@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("/user")
@@ -85,9 +83,31 @@ public class UserController extends BaseController {
     @ResponseBody
     public Result roleList(@PathVariable Long id){
         SysUser user = sysUserService.findOne(id);
-        Set<SysRole> myRoles = user.getRoleList();
+        Set<SysRole> myRoles = user.getRoleSet();
         result.simple(true, "成功！");
         result.putItems("myRoles", myRoles);
+        return result;
+    }
+
+    @PostMapping("/setRole/{id}")
+    @ResponseBody
+    public Result setRole(@PathVariable Long id, @RequestParam Map<String, String> param){
+        //Enumeration<String> em = request.getParameterNames();
+        //request.getParameter("roles[]");
+        //List<String> roles = Collections.singletonList(request.getParameter("roles[]"));
+        List<Long> ids = new ArrayList();
+        String[] roleStr = param.get("roles").split("\\|");
+        for(String s : roleStr){
+            ids.add(Long.parseLong(s));
+        }
+        List<SysRole> myRoles = sysRoleService.findAll(ids);
+        Set<SysRole> roles = new HashSet(myRoles);
+        SysUser user = sysUserService.findOne(id);
+        user.setRoleSet(roles);
+        sysUserService.save(user);
+
+        result.simple(true, "成功！");
+
         return result;
     }
 }

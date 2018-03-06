@@ -47,7 +47,7 @@
     </el-dialog>
     <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
         <el-checkbox-group v-model="myRoles">
-            <el-checkbox v-for="role in roleList" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
+            <el-checkbox v-for="role in roleSet" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
         </el-checkbox-group>
         <div slot="footer" class="dialog-footer">
             <el-button @click="roleDlg.visible = false" size="small">取 消</el-button>
@@ -67,7 +67,7 @@
         data: {
             listData: [
                 <#list users as user>
-                    { id: '${user.id}', username: '${user.username}', nickname: '${user.nickname}', myRoles: [<#list user.roleList![] as role>'${role.id}'</#list><#sep>,</#sep>] }<#sep>,</#sep>
+                    { id: '${user.id}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list user.roleSet![] as role>'${role.id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false,
@@ -81,12 +81,13 @@
             userForm: {},
             roleDlg: {
                 visible: false,
+                id: -1,
                 title: '选择角色',
                 okBtnLoading: false
             },
-            roleList: [
-                <#list roleList as role>
-                    {id: '${role.id}', code: '${role.code}', name: '${role.name}'}<#sep>,</#sep>
+            roleSet: [
+                <#list roleSet as role>
+                    {id: '${role.id}', code: '${role.code?js_string}', name: '${role.name?js_string}'}<#sep>,</#sep>
                 </#list>
             ],
             myRoles: []
@@ -160,10 +161,20 @@
             },
             handleRole: function(index){
                 this.roleDlg.visible = true;
+                this.roleDlg.id = index;
                 this.myRoles = JSON.parse(JSON.stringify(this.listData[index].myRoles));
             },
             setRoles: function(){
                 var $this = this;
+                myPost('/user/setRole/'+this.roleDlg.id, {roles: this.myRoles.join('|')},
+                    function(data){
+                        if(data.flag) {
+                            $this.$message.success(data.msg);
+                        }else{
+                            $this.$message.error(data.msg);
+                        }
+                    }
+                );
             }
         }
     });
