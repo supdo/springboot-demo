@@ -49,15 +49,15 @@ public class SysRole extends BaseEntity implements Serializable {
 	@Column(nullable=false)
 	private String status  = "1";
 	
-	@ManyToMany(fetch= FetchType.LAZY, mappedBy = "roleList")
-	private List<SysUser> userList;
+	@ManyToMany(fetch= FetchType.LAZY, mappedBy = "roleSet")
+	private Set<SysUser> userSet;
 
 	@ManyToMany(fetch= FetchType.LAZY)
     @JoinTable(name = "sys_role_permission", 
     	joinColumns = {@JoinColumn(name = "role_id", referencedColumnName ="id") }, 
     	inverseJoinColumns = {@JoinColumn(name = "permission_id", referencedColumnName ="id") }
     )
-    private Set<SysPermission> permissionList;
+    private Set<SysPermission> permissionSet;
 
 	@Override
 	public boolean equals(Object o) {
@@ -125,20 +125,20 @@ public class SysRole extends BaseEntity implements Serializable {
 		this.status = status;
 	}
 	
-	public List<SysUser> getUserList() {
-		return userList;
+	public Set<SysUser> getUserSet() {
+		return userSet;
 	}
 
-	public void setUserList(List<SysUser> userList) {
-		this.userList = userList;
+	public void setUserSet(Set<SysUser> userSet) {
+		this.userSet = userSet;
 	}
 
-	public Set<SysPermission> getPermissionList() {
-		return permissionList;
+	public Set<SysPermission> getPermissionSet() {
+		return permissionSet;
 	}
 
-	public void setPermissionList(Set<SysPermission> permissionList) {
-		this.permissionList = permissionList;
+	public void setPermissionSet(Set<SysPermission> permissionSet) {
+		this.permissionSet = permissionSet;
 	}
 	
 }

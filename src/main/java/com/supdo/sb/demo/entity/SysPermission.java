@@ -3,6 +3,7 @@ package com.supdo.sb.demo.entity;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +16,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import com.supdo.sb.demo.entity.FormMeta.FormType;
-import com.supdo.sb.demo.entity.SysRole.IRole;
 
 @Entity
 @Table(name="sys_permission")
@@ -50,8 +50,8 @@ public class SysPermission extends BaseEntity implements Serializable{
 	@Column(nullable=false)
 	private String status = "1";
 	
-	@ManyToMany(fetch= FetchType.LAZY, mappedBy = "permissionList")
-	private List<SysRole> roleList;
+	@ManyToMany(fetch= FetchType.LAZY, mappedBy = "permissionSet")
+	private Set<SysRole> roleSet;
 
 	@Override
 	public boolean equals(Object o) {
@@ -116,12 +116,12 @@ public class SysPermission extends BaseEntity implements Serializable{
 		this.status = status;
 	}
 
-	public List<SysRole> getRoleList() {
-		return roleList;
+	public Set<SysRole> getRoleSet() {
+		return roleSet;
 	}
 
-	public void setRoleList(List<SysRole> roleList) {
-		this.roleList = roleList;
+	public void setRoleSet(Set<SysRole> roleSet) {
+		this.roleSet = roleSet;
 	}
 	
 }

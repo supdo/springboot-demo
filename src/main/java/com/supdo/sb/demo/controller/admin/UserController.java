@@ -7,6 +7,7 @@ import com.supdo.sb.demo.service.SysUserService;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -91,23 +92,19 @@ public class UserController extends BaseController {
 
     @PostMapping("/setRole/{id}")
     @ResponseBody
+    @Transactional
     public Result setRole(@PathVariable Long id, @RequestParam Map<String, String> param){
-        //Enumeration<String> em = request.getParameterNames();
-        //request.getParameter("roles[]");
-        //List<String> roles = Collections.singletonList(request.getParameter("roles[]"));
         List<Long> ids = new ArrayList();
-        String[] roleStr = param.get("roles").split("\\|");
-        for(String s : roleStr){
-            ids.add(Long.parseLong(s));
-        }
-        List<SysRole> myRoles = sysRoleService.findAll(ids);
-        Set<SysRole> roles = new HashSet(myRoles);
+        String[] roleStr = param.get("roles").length() > 0 ? param.get("roles").split("\\|") :  new String[]{};
+        for(String s : roleStr){ ids.add(Long.parseLong(s)); }
+        List<SysRole> newRoles = sysRoleService.findAll(ids);
         SysUser user = sysUserService.findOne(id);
-        user.setRoleSet(roles);
+        Set<SysRole> nowRoles = user.getRoleSet();
+        nowRoles.clear();
+        nowRoles.addAll(newRoles);
         sysUserService.save(user);
 
-        result.simple(true, "成功！");
-
+        result.simple(true, "设置成功！");
         return result;
     }
 }

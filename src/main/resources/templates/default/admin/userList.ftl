@@ -81,12 +81,12 @@
             userForm: {},
             roleDlg: {
                 visible: false,
-                id: -1,
+                index: -1,
                 title: '选择角色',
                 okBtnLoading: false
             },
             roleSet: [
-                <#list roleSet as role>
+                <#list roleList as role>
                     {id: '${role.id}', code: '${role.code?js_string}', name: '${role.name?js_string}'}<#sep>,</#sep>
                 </#list>
             ],
@@ -161,15 +161,17 @@
             },
             handleRole: function(index){
                 this.roleDlg.visible = true;
-                this.roleDlg.id = index;
+                this.roleDlg.index = index;
                 this.myRoles = JSON.parse(JSON.stringify(this.listData[index].myRoles));
             },
             setRoles: function(){
                 var $this = this;
-                myPost('/user/setRole/'+this.roleDlg.id, {roles: this.myRoles.join('|')},
+                myPost('/user/setRole/'+$this.listData[$this.roleDlg.index].id, {roles: this.myRoles.join('|')},
                     function(data){
                         if(data.flag) {
                             $this.$message.success(data.msg);
+                            $this.listData[$this.roleDlg.index].myRoles = JSON.parse(JSON.stringify($this.myRoles));
+                            $this.roleDlg.visible = false;
                         }else{
                             $this.$message.error(data.msg);
                         }
