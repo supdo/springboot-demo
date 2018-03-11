@@ -72,3 +72,4 @@ logging:
     org:
       springframework:
         web: DEBUG
+  file: log.log

@@ -70,7 +70,7 @@ public class SysUser extends BaseEntity implements Serializable{
 	@Column(name="last_update_time")
 	private Timestamp lastUpdateTime;
 	
-	@ManyToMany(fetch= FetchType.EAGER)
+	@ManyToMany(fetch= FetchType.LAZY)
     @JoinTable(name = "sys_user_role", 
     	joinColumns = {@JoinColumn(name = "user_id", referencedColumnName ="id") }, 
     	inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName ="id") }

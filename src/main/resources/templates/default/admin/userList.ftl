@@ -36,13 +36,13 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-dialog :title="addUserDlg.title" :visible.sync="addUserDlg.visible" top="30px" width="400px">
-        <el-form ref="addUserForm" :model="userForm" label-width="80px" size="small">
-             <@mf.Hform items=user.fields formData='userForm' formError='userFormError' />
+    <el-dialog :title="userDlg.title" :visible.sync="userDlg.visible" top="30px" width="400px">
+        <el-form ref="userForm" :model="userDlg.userForm" label-width="80px" size="small">
+             <@mf.Hform items=user.fields formData='userDlg.userForm' refName='userForm' />
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="addUserDlg.visible = false" size="small">取 消</el-button>
-            <el-button :loading="addUserDlg.okBtnLoading" type="primary" @click="addUser()" size="small">确 定</el-button>
+            <el-button @click="userDlg.visible = false" size="small">取 消</el-button>
+            <el-button :loading="userDlg.okBtnLoading" type="primary" @click="addUser()" size="small">确 定</el-button>
         </div>
     </el-dialog>
     <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
@@ -67,18 +67,18 @@
         data: {
             listData: [
                 <#list users as user>
-                    { id: '${user.id}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list user.roleSet![] as role>'${role.id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
+                    { id: '${user.id?c}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list user.roleSet![] as role>'${role.id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false,
-            addUserDlg: {
+            userDlg: {
                 visible: false,
                 title: '添加用户',
-                okBtnLoading: false
+                okBtnLoading: false,
+                userForm: {}
             },
             userModel: {id:'', username:'', password: '', rePassword: '', nickname: ''},
-            userFormError: {},
-            userForm: {},
+
             roleDlg: {
                 visible: false,
                 index: -1,
@@ -93,68 +93,67 @@
             myRoles: []
         },
         methods: {
-            initAddUserDlg: function(index, title) {
+            inituserDlg: function(index, title) {
                 if(index<0) {
-                    this.userForm = JSON.parse(JSON.stringify(this.userModel));
+                    this.userDlg.userForm = JSON.parse(JSON.stringify(this.userModel));
                 }else{
-                    this.userForm = JSON.parse(JSON.stringify(this.listData[index]));
+                    this.userDlg.userForm = JSON.parse(JSON.stringify(this.listData[index]));
                 }
-                this.addUserDlg.visible = true;
-                this.addUserDlg.title = title;
-                this.addUserDlg.okBtnLoading = false;
-                //this.$refs.addUserForm.clearValidate();
+                this.userDlg.visible = true;
+                this.userDlg.title = title;
+                this.userDlg.okBtnLoading = false;
+                if(this.$refs.userForm){
+                    this.$refs.userForm.clearValidate();
+                }
             },
             handleEdit: function(index){
-                this.initAddUserDlg(index, '编辑用户');
-                //this.$refs.addUserForm.clearValidate();
+                this.inituserDlg(index, '编辑用户');
             },
             handleDelete: function(index){
                 var $this = this;
                 this.tableLoading = true;
                 myPost('/user/delete/'+this.listData[index].id, {},
-                        function(data){
-                            if(data.flag) {
-                                $this.listData.splice(index, 1);
-                                $this.$message.success(data.msg);
-                            }else{
-                                $this.$message.error(data.msg);
-                            }
-                            $this.tableLoading = false;
+                    function(data){
+                        if(data.flag) {
+                            $this.listData.splice(index, 1);
+                            $this.$message.success(data.msg);
+                        }else{
+                            $this.$message.error(data.msg);
                         }
+                        $this.tableLoading = false;
+                    }
                 );
             },
             handleAdd: function() {
-                this.initAddUserDlg(-1, '添加用户');
-                //this.$refs.addUserForm.clearValidate();
+                this.inituserDlg(-1, '添加用户');
             },
             addUser: function(){
                 var $this = this;
-                this.$refs.addUserForm.clearValidate();
-                this.$refs.addUserForm.validate(function(valid) {
+                this.$refs.userForm.validate(function(valid) {
                     if (valid) {
-                        $this.addUserDlg.okBtnLoading = true;
-                        myPost('/user/add', $this.userForm,
-                                function(data){
-                                    if(data.flag){
-                                        $this.$message.success(data.msg);
-                                        $this.addUserDlg.visible = false;
-                                        $this.listData.unshift(data.items.newObj);
-                                    }else{
-                                        $this.$message.error(data.msg);
-                                        var users = data.items.user.fields;
-                                        $this.$nextTick(function() {
-                                            for(var key in users) {
-                                                $this.$refs['userFormError_' + key].error = users[key]['error'];
-                                            }
-                                        });
-                                    }
-                                },
-                                function(req, textStatus){
-                                    $this.$message.error(textStatus);
-                                },
-                                function(req, textStatus){
-                                    $this.addUserDlg.okBtnLoading = false;
+                        $this.userDlg.okBtnLoading = true;
+                        myPost('/user/save', $this.userDlg.userForm,
+                            function(data){
+                                if(data.flag){
+                                    $this.$message.success(data.msg);
+                                    $this.userDlg.visible = false;
+                                    $this.listData.unshift(data.items.newObj);
+                                }else{
+                                    $this.$message.error(data.msg);
+                                    var users = data.items.user.fields;
+                                    $this.$nextTick(function() {
+                                        for(var key in users) {
+                                            $this.$refs['userForm_' + key].error = users[key]['error'];
+                                        }
+                                    });
                                 }
+                            },
+                            function(req, textStatus){
+                                $this.$message.error(textStatus);
+                            },
+                            function(req, textStatus){
+                                $this.userDlg.okBtnLoading = false;
+                            }
                         );
                     }
                 });
@@ -166,11 +165,11 @@
             },
             setRoles: function(){
                 var $this = this;
-                myPost('/user/setRole/'+$this.listData[$this.roleDlg.index].id, {roles: this.myRoles.join('|')},
+                myPost('/user/setRole/'+$this.listData[$this.roleDlg.index].id, {roles: $this.roleDlg.myRoles.join('|')},
                     function(data){
                         if(data.flag) {
                             $this.$message.success(data.msg);
-                            $this.listData[$this.roleDlg.index].myRoles = JSON.parse(JSON.stringify($this.myRoles));
+                            $this.listData[$this.roleDlg.index].myRoles = JSON.parse(JSON.stringify($this.roleDlg.myRoles));
                             $this.roleDlg.visible = false;
                         }else{
                             $this.$message.error(data.msg);

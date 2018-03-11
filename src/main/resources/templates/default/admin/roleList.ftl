@@ -32,11 +32,29 @@
         <el-table-column label="操作" width="220">
             <template slot-scope="scope">
                 <el-button @click="handleEdit(scope.$index)" type="primary" size="mini">编辑</el-button>
-                <el-button @click="handleRole(scope.$index)" type="primary" size="mini">权限</el-button>
+                <el-button @click="handlePermission(scope.$index)" type="primary" size="mini">权限</el-button>
                 <el-button @click="handleDelete(scope.$index)" type="danger" size="mini">删除</el-button>
             </template>
         </el-table-column>
     </el-table>
+    <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
+        <el-form ref="roleForm" :model="roleDlg.roleForm" label-width="80px" size="small">
+             <@mf.Hform items=role.fields formData='roleDlg.roleForm' refName="roleForm" />
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="roleDlg.visible = false" size="small">取 消</el-button>
+            <el-button :loading="roleDlg.okBtnLoading" type="primary" @click="addRole()" size="small">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="选择权限" :visible.sync="permissionDlg.visible" top="30px" width="400px">
+        <el-checkbox-group v-model="permissionDlg.myPermissions">
+            <el-checkbox v-for="permission in permissionList" :label="permission.id" :key="permission.id">{{permission.name}}({{permission.code}})</el-checkbox>
+        </el-checkbox-group>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="permissionDlg.visible = false" size="small">取 消</el-button>
+            <el-button :loading="permissionDlg.okBtnLoading" type="primary" @click="setPermission()" size="small">确 定</el-button>
+        </div>
+    </el-dialog>
 </div>
 <script type="text/javascript" src="/js/jquery.ajax.js"></script>
 <script type="text/javascript" src="/js/vue.min.js"></script>
@@ -48,14 +66,122 @@
         data: {
             listData: [
                 <#list roles as role>
-                    { id: '${role.id}', code: '${role.code?js_string}', name: '${role.name?js_string}', description: '${role.description?js_string}', myPermission: [<#list role.permissionSet![] as permission>'${permission.id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
+                    { id: '${role.id?c}', code: '${role.code?js_string}', name: '${role.name?js_string}', description: '${role.description?js_string}', myPermissions: [<#list myPermissions[role.id?c]![] as permission_id>'${permission_id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
-            tableLoading: false
+            tableLoading: false,
+            roleModel: {id: '', code: '', name: '', description: ''},
+            roleDlg: {
+                visible: false,
+                title: '添加角色',
+                okBtnLoading: false,
+                roleForm: {}
+            },
+            permissionDlg: {
+                visible: false,
+                index: -1,
+                okBtnLoading: false,
+                myPermissions: {}
+            },
+            permissionList: [
+                <#list permissionList as permission>
+                    {id: '${permission.id}', code: '${permission.code?js_string}', name: '${permission.name?js_string}'}<#sep>,</#sep>
+                </#list>
+            ]
         },
         methods: {
+            initroleDlg: function(index, title){
+                var $this = this;
+                if(index < 0){
+                    this.roleDlg.roleForm = JSON.parse(JSON.stringify(this.roleModel));
+                }else{
+                    this.roleDlg.roleForm = JSON.parse(JSON.stringify(this.listData[index]));
+                }
+                this.roleDlg.visible = true;
+                this.roleDlg.title = title
+                this.roleDlg.okBtnLoading = false;
+                //首次显示前this.$refs中没有roleForm，因为roleForm还没加载到虚拟dom中。
+                if(this.$refs.roleForm) {
+                    this.$refs.roleForm.clearValidate();
+                }
+            },
             handleAdd: function() {
-
+                this.initroleDlg(-1, '添加角色');
+            },
+            handleEdit: function(index){
+                this.initroleDlg(index, '修改角色');
+            },
+            handleDelete: function(index){
+                var $this = this;
+                this.tableLoading = true;
+                myPost('/role/delete/'+this.listData[index].id, {},
+                    function(data){
+                        if(data.flag) {
+                            $this.listData.splice(index, 1);
+                            $this.$message.success(data.msg);
+                        }else{
+                            $this.$message.error(data.msg);
+                        }
+                        $this.tableLoading = false;
+                    }
+                );
+            },
+            handlePermission: function(index){
+                this.permissionDlg.visible = true;
+                this.permissionDlg.index = index;
+                this.permissionDlg.myPermissions = this.listData[index].myPermissions;
+            },
+            addRole: function(){
+                var $this = this;
+                this.$refs.roleForm.validate(function(valid) {
+                    if (valid) {
+                        $this.roleDlg.okBtnLoading = true;
+                        myPost('/role/save', $this.roleDlg.roleForm,
+                            function (data) {
+                                if (data.flag) {
+                                    $this.$message.success(data.msg);
+                                    $this.roleDlg.visible = false;
+                                    $this.listData.unshift(data.items.newObj);
+                                } else {
+                                    $this.$message.error(data.msg);
+                                    var roles = data.items.role.fields;
+                                    $this.$nextTick(function () {
+                                        for (var key in roles) {
+                                            $this.$refs['roleForm_' + key].error = roles[key]['error'];
+                                        }
+                                    });
+                                }
+                            },
+                            function (req, textStatus) {
+                                $this.$message.error(textStatus);
+                            },
+                            function (req, textStatus) {
+                                $this.roleDlg.okBtnLoading = false;
+                            }
+                        );
+                    }
+                });
+            },
+            setPermission: function(){
+                var $this = this;
+                $this.permissionDlg.okBtnLoading = true;
+                myPost('/role/setPermission/'+$this.listData[$this.permissionDlg.index].id, {permissions: $this.permissionDlg.myPermissions.join('|')},
+                    function(data){
+                        if(data.flag) {
+                            $this.$message.success(data.msg);
+                            $this.listData[$this.permissionDlg.index].myPermissions = JSON.parse(JSON.stringify($this.permissionDlg.myPermissions));
+                            $this.permissionDlg.visible = false;
+                        }else{
+                            $this.$message.error(data.msg);
+                        }
+                    },
+                    function(req, textStatus){
+                        $this.$message.error(textStatus);
+                    },
+                    function(req, textStatus){
+                        $this.permissionDlg.okBtnLoading = false;
+                    }
+                );
             }
         }
     });

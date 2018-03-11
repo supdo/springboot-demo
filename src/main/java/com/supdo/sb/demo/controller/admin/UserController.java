@@ -1,5 +1,6 @@
 package com.supdo.sb.demo.controller.admin;
 
+import com.supdo.sb.demo.common.StringUtility;
 import com.supdo.sb.demo.entity.SysRole;
 import com.supdo.sb.demo.entity.SysUser;
 import com.supdo.sb.demo.service.SysRoleService;
@@ -40,7 +41,7 @@ public class UserController extends BaseController {
         return render("admin/userList");
     }
 
-    @PostMapping("/add")
+    @PostMapping("/save")
     @ResponseBody
     public Result save(@Validated(SysUser.IUser.class) SysUser userForm, BindingResult bindingResult,
                        HttpServletRequest request, HttpServletResponse reponse) {
@@ -80,23 +81,21 @@ public class UserController extends BaseController {
         return result;
     }
 
-    @GetMapping("/roleList/{id}")
-    @ResponseBody
-    public Result roleList(@PathVariable Long id){
-        SysUser user = sysUserService.findOne(id);
-        Set<SysRole> myRoles = user.getRoleSet();
-        result.simple(true, "成功！");
-        result.putItems("myRoles", myRoles);
-        return result;
-    }
+//    @GetMapping("/roleList/{id}")
+//    @ResponseBody
+//    public Result roleList(@PathVariable Long id){
+//        SysUser user = sysUserService.findOne(id);
+//        Set<SysRole> myRoles = user.getRoleSet();
+//        result.simple(true, "成功！");
+//        result.putItems("myRoles", myRoles);
+//        return result;
+//    }
 
     @PostMapping("/setRole/{id}")
     @ResponseBody
     @Transactional
     public Result setRole(@PathVariable Long id, @RequestParam Map<String, String> param){
-        List<Long> ids = new ArrayList();
-        String[] roleStr = param.get("roles").length() > 0 ? param.get("roles").split("\\|") :  new String[]{};
-        for(String s : roleStr){ ids.add(Long.parseLong(s)); }
+        List<Long> ids = StringUtility.toList(param.get("roles"));
         List<SysRole> newRoles = sysRoleService.findAll(ids);
         SysUser user = sysUserService.findOne(id);
         Set<SysRole> nowRoles = user.getRoleSet();
