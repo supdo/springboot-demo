@@ -36,7 +36,7 @@ public class RoleController extends BaseController {
         for(SysRole role : roles){
             ids.add(role.getId());
         }
-        Map<Long, List<Long>> myPermissions = sysRoleService.getPermissionsByRoles(ids);
+        Map<String, List<Long>> myPermissions = sysRoleService.getPermissionsByRoles(ids);
         map.put("myPermissions", myPermissions);
 
         SysRole role = new SysRole();

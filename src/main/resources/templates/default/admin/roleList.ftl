@@ -66,7 +66,7 @@
         data: {
             listData: [
                 <#list roles as role>
-                    { id: '${role.id?c}', code: '${role.code?js_string}', name: '${role.name?js_string}', description: '${role.description?js_string}', myPermissions: [<#list myPermissions[role.id?c]![] as permission_id>'${permission_id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
+                    { id: '${role.id?c}', code: '${role.code?js_string}', name: '${role.name?js_string}', description: '${role.description?js_string}', myPermissions: [<#list myPermissions[role.id?c]![] as permission_id>'${permission_id?c}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false,

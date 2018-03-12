@@ -31,6 +31,13 @@ public class UserController extends BaseController {
         List<SysUser> users = sysUserService.findAll();
         map.put("users", users);
 
+        List<Long> ids = new ArrayList<>();
+        for(SysUser role : users){
+            ids.add(role.getId());
+        }
+        Map<String, List<Long>> myRoles = sysUserService.getRolesByUsers(ids);
+        map.put("myRoles", myRoles);
+
         SysUser user = new SysUser();
         user.initForm(SysUser.IUser.class);
         map.put("user", user);

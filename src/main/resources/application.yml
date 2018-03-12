@@ -71,5 +71,5 @@ logging:
   level:
     org:
       springframework:
-        web: DEBUG
+        web: INFO
   file: log.log

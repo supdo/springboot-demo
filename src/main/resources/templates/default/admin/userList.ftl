@@ -46,7 +46,7 @@
         </div>
     </el-dialog>
     <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
-        <el-checkbox-group v-model="myRoles">
+        <el-checkbox-group v-model="roleDlg.myRoles">
             <el-checkbox v-for="role in roleSet" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
         </el-checkbox-group>
         <div slot="footer" class="dialog-footer">
@@ -67,7 +67,7 @@
         data: {
             listData: [
                 <#list users as user>
-                    { id: '${user.id?c}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list user.roleSet![] as role>'${role.id}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
+                    { id: '${user.id?c}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list myRoles[user.id?c]![] as role_id>'${role_id?c}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false,
@@ -83,14 +83,14 @@
                 visible: false,
                 index: -1,
                 title: '选择角色',
-                okBtnLoading: false
+                okBtnLoading: false,
+                myRoles: []
             },
             roleSet: [
                 <#list roleList as role>
-                    {id: '${role.id}', code: '${role.code?js_string}', name: '${role.name?js_string}'}<#sep>,</#sep>
+                    {id: '${role.id?c}', code: '${role.code?js_string}', name: '${role.name?js_string}'}<#sep>,</#sep>
                 </#list>
-            ],
-            myRoles: []
+            ]
         },
         methods: {
             inituserDlg: function(index, title) {
@@ -161,7 +161,7 @@
             handleRole: function(index){
                 this.roleDlg.visible = true;
                 this.roleDlg.index = index;
-                this.myRoles = JSON.parse(JSON.stringify(this.listData[index].myRoles));
+                this.roleDlg.myRoles = JSON.parse(JSON.stringify(this.listData[index].myRoles));
             },
             setRoles: function(){
                 var $this = this;

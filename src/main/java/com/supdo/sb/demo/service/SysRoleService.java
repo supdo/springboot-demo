@@ -2,11 +2,8 @@ package com.supdo.sb.demo.service;
 
 import java.util.*;
 
+import com.supdo.sb.demo.dao.SysDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.supdo.sb.demo.dao.SysRoleRepository;
@@ -19,21 +16,27 @@ public class SysRoleService {
 	private SysRoleRepository sysRoleRepository;
 
 	@Autowired
-	@Qualifier("defaultNamedParameterJdbcTemplate")
-	private NamedParameterJdbcTemplate defaultJdbc;
+	private SysDao sysDao;
+
+	//使用使用EntityManager实现了，具体在SysDaoImpl类中实现
+//	@Qualifier("defaultNamedParameterJdbcTemplate")
+//	@Autowired
+//	private JdbcTemplate defaultJdbc;
 	
 	public List<SysRole> findAll(){
 		return sysRoleRepository.findAll();
 	}
 
-	public Map<Long, List<Long>> getPermissionsByRoles(List<Long> ids){
-		Map<Long, List<Long>> result = new HashMap<>();
-		String sql = "select rp.* from sys_role_permission rp where rp.role_id in (:ids)";
-		MapSqlParameterSource parameters = new MapSqlParameterSource();
-		parameters.addValue("ids", ids);
-		List<Map<String,Object>> queryList = defaultJdbc.queryForList(sql, parameters);
-		for (Map<String, Object> map : queryList) {
-			Long rold_id = Long.parseLong(map.get("role_id").toString());
+	public Map<String, List<Long>> getPermissionsByRoles(List<Long> ids){
+		Map<String, List<Long>> result = new HashMap<>();
+//		List<Object[]> queryList1 = sysRoleRepository.getPermissionsByRoles(ids);
+//		String sql = "select rp.* from sys_role_permission rp where rp.role_id in (:ids)";
+//		MapSqlParameterSource parameters = new MapSqlParameterSource();
+//		parameters.addValue("ids", ids);
+//		List<Map<String,Object>> queryList = defaultJdbc.queryForList(sql, parameters);
+		List<Map<String,Object>> rows = sysDao.getPermissionsByRoles(ids);
+		for (Map<String, Object> map : rows) {
+			String rold_id = map.get("role_id").toString();
 			if(!result.containsKey(rold_id)){
 				result.put(rold_id, new ArrayList<>());
 			}
