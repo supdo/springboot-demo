@@ -79,6 +79,12 @@ public class SysUser extends BaseEntity implements Serializable{
 
 	public interface IUser {}
     public interface IUserLogin {}
+
+
+	@Override
+	public String toString(){
+		return "";
+	}
 		
 	public Long getId() {
 		return id;

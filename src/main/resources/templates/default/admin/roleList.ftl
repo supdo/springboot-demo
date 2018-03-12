@@ -11,8 +11,16 @@
         #roleList {
             margin: 10px;
         }
+        .el-message-box{
+            display: block;
+            margin: 100px auto 0px auto;
+        }
         .el-dialog__body {
             padding: 5px 20px;
+        }
+        .table-delete-row td {
+            background-color: #CC0000;
+            color: #FFFFFF;
         }
     </style>
 </head>
@@ -22,6 +30,7 @@
     <el-button @click="handleAdd()" type="primary" size="mini">添加角色</el-button>
     <el-table :data="listData" border style="width: 100%" size="small"
               v-loading="tableLoading"
+              :row-class-name="tableRowClassName"
               element-loading-text="数据处理中..."
               element-loading-spinner="el-icon-loading"
               element-loading-background="rgba(0, 0, 0, 0.8)">
@@ -70,6 +79,7 @@
                 </#list>
             ],
             tableLoading: false,
+            deletedRow: -1,
             roleModel: {id: '', code: '', name: '', description: ''},
             roleDlg: {
                 visible: false,
@@ -113,18 +123,29 @@
             },
             handleDelete: function(index){
                 var $this = this;
-                this.tableLoading = true;
-                myPost('/role/delete/'+this.listData[index].id, {},
-                    function(data){
-                        if(data.flag) {
-                            $this.listData.splice(index, 1);
-                            $this.$message.success(data.msg);
-                        }else{
-                            $this.$message.error(data.msg);
-                        }
-                        $this.tableLoading = false;
+                this.deletedRow = index;
+                this.$confirm('您确定要删除此角色么?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    callback: function(action, instance){
+                       if(action =='confirm'){
+                           myPost('/role/delete/'+$this.listData[index].id, {},
+                                   function(data){
+                                       if(data.flag) {
+                                           $this.listData.splice(index, 1);
+                                           $this.$message.success(data.msg);
+                                       }else{
+                                           $this.$message.error(data.msg);
+                                       }
+                                       $this.deletedRow = -1;
+                                   }
+                           );
+                       }else if(action == 'cancel'){
+                           $this.deletedRow = -1;
+                       }
                     }
-                );
+                });
             },
             handlePermission: function(index){
                 this.permissionDlg.visible = true;
@@ -182,6 +203,14 @@
                         $this.permissionDlg.okBtnLoading = false;
                     }
                 );
+            },
+            tableRowClassName: function(row) {
+                //{row, rowIndex}
+                if (row.rowIndex === this.deletedRow) {
+                    return 'table-delete-row';
+                } else {
+                    return '';
+                }
             }
         }
     });

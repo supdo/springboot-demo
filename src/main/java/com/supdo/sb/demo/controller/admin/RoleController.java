@@ -76,8 +76,12 @@ public class RoleController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id){
-        sysRoleService.delete(id);
-        this.result.simple(true, "删除成功！");
+        if(sysRoleService.countUserList(id)>0){
+            this.result.simple(false, "此角色有用户在使用，不能删除！");
+        }else {
+            sysRoleService.delete(id);
+            this.result.simple(true, "删除成功！");
+        }
         return result;
     }
 

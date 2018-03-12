@@ -66,6 +66,11 @@ public class SysPermission extends BaseEntity implements Serializable{
 		return Objects.hash(id);
 	}
 
+	@Override
+	public String toString(){
+		return "";
+	}
+
 	public interface IPermission {}
 
 	public Long getId() {

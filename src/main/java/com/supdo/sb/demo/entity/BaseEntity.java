@@ -9,6 +9,8 @@ import java.util.List;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import javax.persistence.ManyToMany;
+
 public class BaseEntity {
 	
 	private LinkedHashMap<String, FormField> fields = new LinkedHashMap<String, FormField>();
@@ -73,6 +75,10 @@ public class BaseEntity {
 
 		for (Field field : myFields) {
 			String name = field.getName();
+			ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
+			if(manyToMany != null) {
+				continue;
+			}
 			field.setAccessible(true);
 			try {
 				if(!Modifier.isStatic(field.getModifiers())

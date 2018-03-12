@@ -40,16 +40,3 @@ function myPost(url, params, success, error, complete){
         complete: complete
     });
 };
-
-/*
-给formitem设置错误信息
- */
-function setFormError(item, error){
-    if(error) {
-        item.validateMessage = error;
-        item.validateState = 'error';
-    }else{
-        item.validateMessage = error;
-        item.validateState = 'success';
-    }
-};

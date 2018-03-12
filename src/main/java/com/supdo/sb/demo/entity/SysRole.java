@@ -72,6 +72,11 @@ public class SysRole extends BaseEntity implements Serializable {
 		return Objects.hash(id);
 	}
 
+	@Override
+	public String toString(){
+		return "";
+	}
+
 	public interface IRole {}
 	
 	public SysRole() {
