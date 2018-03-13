@@ -18,10 +18,6 @@
         .el-dialog__body {
             padding: 5px 20px;
         }
-        .table-delete-row td {
-            background-color: #CC0000;
-            color: #FFFFFF;
-        }
     </style>
 </head>
 <body>
@@ -29,14 +25,15 @@
 <div id="roleList" v-cloak>
     <el-button @click="handleAdd()" type="primary" size="mini">添加角色</el-button>
     <el-table :data="listData" border style="width: 100%" size="small"
-              v-loading="tableLoading"
               :row-class-name="tableRowClassName"
+              v-loading="tableLoading"
               element-loading-text="数据处理中..."
               element-loading-spinner="el-icon-loading"
               element-loading-background="rgba(0, 0, 0, 0.8)">
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="code" label="编码" width="180"></el-table-column>
         <el-table-column prop="name" label="名称" width="180"></el-table-column>
+        <el-table-column prop="name" label="类型" width="180"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column label="操作" width="220">
             <template slot-scope="scope">
@@ -52,7 +49,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="roleDlg.visible = false" size="small">取 消</el-button>
-            <el-button :loading="roleDlg.okBtnLoading" type="primary" @click="addRole()" size="small">确 定</el-button>
+            <el-button :loading="roleDlg.okBtnLoading" type="primary" @click="saveRole()" size="small">确 定</el-button>
         </div>
     </el-dialog>
     <el-dialog title="选择权限" :visible.sync="permissionDlg.visible" top="30px" width="400px">
@@ -79,7 +76,7 @@
                 </#list>
             ],
             tableLoading: false,
-            deletedRow: -1,
+            deleteRow: {index: -1, className: ''},
             roleModel: {id: '', code: '', name: '', description: ''},
             roleDlg: {
                 visible: false,
@@ -123,7 +120,7 @@
             },
             handleDelete: function(index){
                 var $this = this;
-                this.deletedRow = index;
+                $this.deleteRow = {index: index, className: 'table-deleting-row'};
                 this.$confirm('您确定要删除此角色么?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -133,16 +130,18 @@
                            myPost('/role/delete/'+$this.listData[index].id, {},
                                    function(data){
                                        if(data.flag) {
+                                           $this.deleteRow.className = 'table-deleted-row';
+                                           delayFun(function(){$this.deleteRow.index = -1;}, 400);
                                            $this.listData.splice(index, 1);
                                            $this.$message.success(data.msg);
                                        }else{
                                            $this.$message.error(data.msg);
+                                           delayFun(function(){$this.deleteRow.index = -1;}, 200);
                                        }
-                                       $this.deletedRow = -1;
                                    }
                            );
                        }else if(action == 'cancel'){
-                           $this.deletedRow = -1;
+                           delayFun(function(){$this.deleteRow.index = -1;}, 200);
                        }
                     }
                 });
@@ -152,7 +151,7 @@
                 this.permissionDlg.index = index;
                 this.permissionDlg.myPermissions = this.listData[index].myPermissions;
             },
-            addRole: function(){
+            saveRole: function(){
                 var $this = this;
                 this.$refs.roleForm.validate(function(valid) {
                     if (valid) {
@@ -206,8 +205,8 @@
             },
             tableRowClassName: function(row) {
                 //{row, rowIndex}
-                if (row.rowIndex === this.deletedRow) {
-                    return 'table-delete-row';
+                if (row.rowIndex === this.deleteRow.index) {
+                    return this.deleteRow.className;
                 } else {
                     return '';
                 }

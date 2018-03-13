@@ -25,3 +25,14 @@ a {
 
 /*避免在ie下出现error提示和input的距离过大。*/
 .el-form-item__content {line-height: normal;}
+
+
+.table-deleting-row td {
+    background-color: #CC3300;
+    color: #FFFFFF;
+}
+
+.table-deleted-row td {
+    background-color: #990000;
+    color: #FFFFFF;
+}

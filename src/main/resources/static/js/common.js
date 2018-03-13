@@ -40,3 +40,11 @@ function myPost(url, params, success, error, complete){
         complete: complete
     });
 };
+function delayFun(fun, duration){
+    if(duration == undefined){
+        duration = 1000;
+    }
+    var t;
+    clearTimeout(t)
+    t = setTimeout(fun, duration);
+}

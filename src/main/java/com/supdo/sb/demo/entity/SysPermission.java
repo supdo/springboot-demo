@@ -5,16 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.supdo.sb.demo.entity.FormMeta.FormType;
 
 @Entity
@@ -27,29 +21,30 @@ public class SysPermission extends BaseEntity implements Serializable{
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 	
-	@Size(min=5, max=30)
+	@Size(min=5, max=30, groups= {IPermission.class})
 	@FormMeta(label="权限编码", required=true, placeholder="权限编码", groups= {IPermission.class})
 	@Column(nullable=false, length=30)
 	private String code;
 	
-	@Size(min=5, max=30)
+	@Size(min=5, max=30, groups= {IPermission.class})
 	@FormMeta(label="权限名", required=true, placeholder="权限名", groups= {IPermission.class})
 	@Column(nullable=false, length=50)
 	private String name;
 	
-	@Size(min=1, max=1)
+	@Size(min=1, max=1, groups= {IPermission.class})
 	@FormMeta(type=FormType.select, label="权限类型", required=true, placeholder="权限类型", options= {"1:功能"}, groups= {IPermission.class})
 	@Column(nullable=false, length=30)
 	private String type;
 	
-	@Size(min=5, max=100)
+	@Size(min=5, max=100, groups= {IPermission.class})
 	@FormMeta(type=FormType.textarea, label="权限描述", required=true, placeholder="权限描述", groups= {IPermission.class})
 	@Column(nullable=true, length=300)
 	private String description;
 	
 	@Column(nullable=false)
 	private String status = "1";
-	
+
+	@JsonIgnore
 	@ManyToMany(fetch= FetchType.LAZY, mappedBy = "permissionSet")
 	private Set<SysRole> roleSet;
 

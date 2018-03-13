@@ -75,10 +75,11 @@ public class BaseEntity {
 
 		for (Field field : myFields) {
 			String name = field.getName();
-			ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
-			if(manyToMany != null) {
-				continue;
-			}
+			//ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
+			//ManyToMany注释字段不处理；
+//			if(manyToMany == null) {
+//
+//			}
 			field.setAccessible(true);
 			try {
 				if(!Modifier.isStatic(field.getModifiers())

@@ -183,7 +183,7 @@
                     title: '系统管理', icon: '', children: {
                         user: {title: '用户管理', icon: '', url: '/user/list'},
                         role: {title: '角色管理', icon: '', url: '/role/list'},
-                        permission: {title: '权限管理', icon: '', url: '//jd.com'}
+                        permission: {title: '权限管理', icon: '', url: '/permission/list'}
                     }
                 }
             },

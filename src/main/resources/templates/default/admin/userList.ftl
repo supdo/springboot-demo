@@ -14,6 +14,10 @@
         .el-dialog__body {
             padding: 5px 20px;
         }
+        .el-message-box{
+            display: block;
+            margin: 100px auto 0px auto;
+        }
     </style>
 </head>
 <body>
@@ -21,6 +25,7 @@
 <div id="userList" v-cloak>
     <el-button @click="handleAdd()" type="primary" size="mini">添加新用户</el-button>
     <el-table :data="listData" border style="width: 100%" size="small"
+              :row-class-name="tableRowClassName"
               v-loading="tableLoading"
               element-loading-text="数据处理中..."
               element-loading-spinner="el-icon-loading"
@@ -42,7 +47,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="userDlg.visible = false" size="small">取 消</el-button>
-            <el-button :loading="userDlg.okBtnLoading" type="primary" @click="addUser()" size="small">确 定</el-button>
+            <el-button :loading="userDlg.okBtnLoading" type="primary" @click="saveUser()" size="small">确 定</el-button>
         </div>
     </el-dialog>
     <el-dialog :title="roleDlg.title" :visible.sync="roleDlg.visible" top="30px" width="400px">
@@ -71,6 +76,7 @@
                 </#list>
             ],
             tableLoading: false,
+            deleteRow: {index: -1, className: ''},
             userDlg: {
                 visible: false,
                 title: '添加用户',
@@ -111,23 +117,36 @@
             },
             handleDelete: function(index){
                 var $this = this;
-                this.tableLoading = true;
-                myPost('/user/delete/'+this.listData[index].id, {},
-                    function(data){
-                        if(data.flag) {
-                            $this.listData.splice(index, 1);
-                            $this.$message.success(data.msg);
-                        }else{
-                            $this.$message.error(data.msg);
+                $this.deleteRow = {index: index, className: 'table-deleting-row'};
+                this.$confirm('您确定要删除此用户么?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    callback: function(action, instance){
+                        if(action =='confirm'){
+                            myPost('/user/delete/'+$this.listData[index].id, {},
+                                    function(data){
+                                        if(data.flag) {
+                                            $this.deleteRow.className = 'table-deleted-row';
+                                            delayFun(function(){$this.deleteRow.index = -1;}, 400);
+                                            $this.listData.splice(index, 1);
+                                            $this.$message.success(data.msg);
+                                        }else{
+                                            $this.$message.error(data.msg);
+                                            delayFun(function(){$this.deleteRow.index = -1;}, 200);
+                                        }
+                                    }
+                            );
+                        }else if(action == 'cancel'){
+                            delayFun(function(){$this.deleteRow.index = -1;}, 200);
                         }
-                        $this.tableLoading = false;
                     }
-                );
+                });
             },
             handleAdd: function() {
                 this.inituserDlg(-1, '添加用户');
             },
-            addUser: function(){
+            saveUser: function(){
                 var $this = this;
                 this.$refs.userForm.validate(function(valid) {
                     if (valid) {
@@ -176,6 +195,14 @@
                         }
                     }
                 );
+            },
+            tableRowClassName: function(row) {
+                //{row, rowIndex}
+                if (row.rowIndex === this.deleteRow.index) {
+                    return this.deleteRow.className;
+                } else {
+                    return '';
+                }
             }
         }
     });
