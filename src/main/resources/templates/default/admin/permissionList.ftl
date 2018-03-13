@@ -42,12 +42,12 @@
         </el-table-column>
     </el-table>
     <el-dialog :title="permissionDlg.title" :visible.sync="permissionDlg.visible" top="30px" width="400px">
-        <el-form ref="permissionForm" :model="permissionDlg.roleForm" label-width="80px" size="small">
+        <el-form ref="permissionForm" :model="permissionDlg.permissionForm" label-width="80px" size="small">
              <@mf.Hform items=permission.fields formData='permissionDlg.permissionForm' refName="permissionForm" />
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="permissionDlg.visible = false" size="small">取 消</el-button>
-            <el-button :loading="permissionDlg.okBtnLoading" type="primary" @click="saveRole()" size="small">确 定</el-button>
+            <el-button :loading="permissionDlg.okBtnLoading" type="primary" @click="savePermission()" size="small">确 定</el-button>
         </div>
     </el-dialog>
 </div>
@@ -69,6 +69,7 @@
             permissionModel: {id: '', code: '', name: '', type: '', description: ''},
             permissionDlg: {
                 visible: false,
+                index: -1,
                 title: '添加权限',
                 okBtnLoading: false,
                 permissionForm: {}
@@ -82,6 +83,7 @@
                 }else{
                     this.permissionDlg.permissionForm = JSON.parse(JSON.stringify(this.listData[index]));
                 }
+                this.permissionDlg.index = index;
                 this.permissionDlg.visible = true;
                 this.permissionDlg.title = title
                 this.permissionDlg.okBtnLoading = false;
@@ -96,7 +98,42 @@
                 this.initDlg(index, '修改权限');
             },
             handleDelete: function(index){
-                this.initDlg(index, '修改权限');
+                delRow(this, index, '/permission/delete/'+this.listData[index].id, '您确定要删除此权限么？');
+            },
+            savePermission: function(){
+                var $this = this;
+                this.$refs.permissionForm.validate(function(valid) {
+                    if (valid) {
+                        $this.permissionDlg.okBtnLoading = true;
+                        myPost('/permission/save', $this.permissionDlg.permissionForm,
+                                function(data){
+                                    if(data.flag){
+                                        $this.$message.success(data.msg);
+                                        $this.permissionDlg.visible = false;
+                                        if($this.permissionDlg.permissionForm.id === '') {
+                                            $this.listData.unshift(data.items.newObj);
+                                        }else{
+                                            $this.listData[$this.permissionDlg.index] = data.items.newObj;
+                                        }
+                                    }else{
+                                        $this.$message.error(data.msg);
+                                        var fields = data.items.permission.fields;
+                                        $this.$nextTick(function() {
+                                            for(var key in fields) {
+                                                $this.$refs['permissionForm_' + key].error = fields[key]['error'];
+                                            }
+                                        });
+                                    }
+                                },
+                                function(req, textStatus){
+                                    $this.$message.error(textStatus);
+                                },
+                                function(req, textStatus){
+                                    $this.permissionDlg.okBtnLoading = false;
+                                }
+                        );
+                    }
+                });
             },
             tableRowClassName: function(row) {
                 //{row, rowIndex}

@@ -79,6 +79,7 @@
             deleteRow: {index: -1, className: ''},
             userDlg: {
                 visible: false,
+                index: -1,
                 title: '添加用户',
                 okBtnLoading: false,
                 userForm: {}
@@ -105,6 +106,7 @@
                 }else{
                     this.userDlg.userForm = JSON.parse(JSON.stringify(this.listData[index]));
                 }
+                this.userDlg.index = index;
                 this.userDlg.visible = true;
                 this.userDlg.title = title;
                 this.userDlg.okBtnLoading = false;
@@ -116,32 +118,7 @@
                 this.inituserDlg(index, '编辑用户');
             },
             handleDelete: function(index){
-                var $this = this;
-                $this.deleteRow = {index: index, className: 'table-deleting-row'};
-                this.$confirm('您确定要删除此用户么?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning',
-                    callback: function(action, instance){
-                        if(action =='confirm'){
-                            myPost('/user/delete/'+$this.listData[index].id, {},
-                                    function(data){
-                                        if(data.flag) {
-                                            $this.deleteRow.className = 'table-deleted-row';
-                                            delayFun(function(){$this.deleteRow.index = -1;}, 400);
-                                            $this.listData.splice(index, 1);
-                                            $this.$message.success(data.msg);
-                                        }else{
-                                            $this.$message.error(data.msg);
-                                            delayFun(function(){$this.deleteRow.index = -1;}, 200);
-                                        }
-                                    }
-                            );
-                        }else if(action == 'cancel'){
-                            delayFun(function(){$this.deleteRow.index = -1;}, 200);
-                        }
-                    }
-                });
+                delRow(this, index, '/user/delete/'+this.listData[index].id, '您确定要删除此用户么？');
             },
             handleAdd: function() {
                 this.inituserDlg(-1, '添加用户');
@@ -156,7 +133,11 @@
                                 if(data.flag){
                                     $this.$message.success(data.msg);
                                     $this.userDlg.visible = false;
-                                    $this.listData.unshift(data.items.newObj);
+                                    if($this.userDlg.userForm.id === '') {
+                                        $this.listData.unshift(data.items.newObj);
+                                    }else{
+                                        $this.listData[$this.userDlg.index] = data.items.newObj;
+                                    }
                                 }else{
                                     $this.$message.error(data.msg);
                                     var users = data.items.user.fields;

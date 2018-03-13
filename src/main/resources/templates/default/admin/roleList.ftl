@@ -33,7 +33,7 @@
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="code" label="编码" width="180"></el-table-column>
         <el-table-column prop="name" label="名称" width="180"></el-table-column>
-        <el-table-column prop="name" label="类型" width="180"></el-table-column>
+        <el-table-column prop="type" label="类型" width="180"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column label="操作" width="220">
             <template slot-scope="scope">
@@ -80,6 +80,7 @@
             roleModel: {id: '', code: '', name: '', description: ''},
             roleDlg: {
                 visible: false,
+                index: -1,
                 title: '添加角色',
                 okBtnLoading: false,
                 roleForm: {}
@@ -104,6 +105,7 @@
                 }else{
                     this.roleDlg.roleForm = JSON.parse(JSON.stringify(this.listData[index]));
                 }
+                this.roleDlg.index = index;
                 this.roleDlg.visible = true;
                 this.roleDlg.title = title
                 this.roleDlg.okBtnLoading = false;
@@ -119,32 +121,7 @@
                 this.initroleDlg(index, '修改角色');
             },
             handleDelete: function(index){
-                var $this = this;
-                $this.deleteRow = {index: index, className: 'table-deleting-row'};
-                this.$confirm('您确定要删除此角色么?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning',
-                    callback: function(action, instance){
-                       if(action =='confirm'){
-                           myPost('/role/delete/'+$this.listData[index].id, {},
-                                   function(data){
-                                       if(data.flag) {
-                                           $this.deleteRow.className = 'table-deleted-row';
-                                           delayFun(function(){$this.deleteRow.index = -1;}, 400);
-                                           $this.listData.splice(index, 1);
-                                           $this.$message.success(data.msg);
-                                       }else{
-                                           $this.$message.error(data.msg);
-                                           delayFun(function(){$this.deleteRow.index = -1;}, 200);
-                                       }
-                                   }
-                           );
-                       }else if(action == 'cancel'){
-                           delayFun(function(){$this.deleteRow.index = -1;}, 200);
-                       }
-                    }
-                });
+                delRow(this, index, '/role/delete/'+this.listData[index].id, '您确定要删除此角色么？');
             },
             handlePermission: function(index){
                 this.permissionDlg.visible = true;
@@ -161,7 +138,12 @@
                                 if (data.flag) {
                                     $this.$message.success(data.msg);
                                     $this.roleDlg.visible = false;
-                                    $this.listData.unshift(data.items.newObj);
+                                    if($this.roleDlg.roleForm.id === '') {
+                                        $this.listData.unshift(data.items.newObj);
+                                    }else{
+                                        $this.$set($this.listData, $this.roleDlg.index, data.items.newObj);
+                                        //$this.listData[] = JSON.parse(JSON.stringify(data.items.newObj));
+                                    }
                                 } else {
                                     $this.$message.error(data.msg);
                                     var roles = data.items.role.fields;

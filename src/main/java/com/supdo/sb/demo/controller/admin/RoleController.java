@@ -57,17 +57,19 @@ public class RoleController extends BaseController {
             this.result.simple(false, "字段校验失败！");
             this.result.putItems("role", roleForm.initFieldErrors(bindingResult));
         }else{
+            SysRole newObj;
             if(roleForm.getId() == null){
-                SysRole newObj = sysRoleService.save(roleForm);
+                newObj = sysRoleService.save(roleForm);
                 this.result.simple(true, "保存成功！");
                 this.result.putItems("newObj", newObj);
             }else{
                 SysRole role = sysRoleService.findOne(roleForm.getId());
                 role.merge(roleForm);
-                SysRole newObj = sysRoleService.save(role);
+                newObj = sysRoleService.save(role);
                 this.result.simple(true, "保存成功！");
                 this.result.putItems("newObj", newObj);
             }
+            newObj.getPermissionSet();
             this.result.putItems("role", roleForm);
         }
         return result;
