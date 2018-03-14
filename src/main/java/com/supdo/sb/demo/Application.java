@@ -20,4 +20,5 @@ public class Application /*extends WebMvcConfigurationSupport*/{
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer.setUseSuffixPatternMatch(false).setUseTrailingSlashMatch(false);
 	}*/
+
 }
