@@ -113,7 +113,7 @@
                                         if($this.permissionDlg.permissionForm.id === '') {
                                             $this.listData.unshift(data.items.newObj);
                                         }else{
-                                            $this.listData[$this.permissionDlg.index] = data.items.newObj;
+                                            $this.$set($this.listData, $this.permissionDlg.index, data.items.newObj);
                                         }
                                     }else{
                                         $this.$message.error(data.msg);

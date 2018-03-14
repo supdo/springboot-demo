@@ -26,8 +26,13 @@ public class UserController extends BaseController {
     @Autowired
     SysRoleService sysRoleService;
 
+    public UserController() {
+
+    }
+
     @GetMapping("/list")
     public String listView(Map<String, Object> map) {
+        result.clearItems();
         List<SysUser> users = sysUserService.findAll();
         map.put("users", users);
 
@@ -50,32 +55,45 @@ public class UserController extends BaseController {
 
     @PostMapping("/save")
     @ResponseBody
-    public Result save(@Validated(SysUser.IUser.class) SysUser userForm, BindingResult bindingResult,
+    public Result save(@Validated({SysUser.IUser.class}) SysUser userForm, BindingResult bindingResult,
                        HttpServletRequest request, HttpServletResponse reponse) {
+        result.clearItems();
         userForm.initForm(SysUser.IUser.class);
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() && userForm.bindingHasError(bindingResult, SysUser.IUser.class)) {
             this.result.simple(false, "校验失败！");
             this.result.putItems("user", userForm.initFieldErrors(bindingResult));
         }else {
             String encryptPassword = new SimpleHash("SHA-1", userForm.getPassword(), userForm.getUsername()).toString();
             userForm.setPassword(encryptPassword);
+            SysUser newObj = null;
             if(userForm.getId() == null){   //新增
                 if(sysUserService.getListByUsername(userForm.getUsername()).size() > 0){
                     this.result.simple(false, "用户名已存在！");
                     userForm.getFields().get("username").setError("用户名已存在！");
+                    this.result.putItems("user", userForm);
                 }else {
-                    SysUser newObj = sysUserService.save(userForm);
+                    newObj = sysUserService.save(userForm);
                     this.result.simple(true, "保存成功！");
-                    this.result.putItems("newObj", newObj);
                 }
             }else { //更新
                 SysUser user = sysUserService.findOne(userForm.getId());
                 user.merge(userForm);
-                SysUser newObj = sysUserService.save(user);
+                newObj = sysUserService.save(user);
                 this.result.simple(true, "保存成功！");
-                this.result.putItems("newObj", newObj);
             }
-            this.result.putItems("user", userForm);
+            //处理前台角色列表
+            if(newObj != null) {
+                newObj.initMap("roleSet");
+                List<String> myRoles = new ArrayList();
+                if(newObj.getRoleSet() != null) {
+                    for (SysRole role : newObj.getRoleSet()) {
+                        myRoles.add(role.getId().toString());
+                    }
+                }
+                newObj.getMap().put("myRoles", myRoles);
+                this.result.putItems("newObj", newObj.getMap());
+            }
+
         }
         return result;
     }
@@ -83,6 +101,7 @@ public class UserController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id) {
+        result.clearItems();
         sysUserService.delete(id);
         this.result.simple(true, "删除成功！");
         return result;
@@ -102,6 +121,7 @@ public class UserController extends BaseController {
     @ResponseBody
     @Transactional
     public Result setRole(@PathVariable Long id, @RequestParam Map<String, String> param){
+        result.clearItems();
         List<Long> ids = StringUtility.toList(param.get("roles"));
         List<SysRole> newRoles = sysRoleService.findAll(ids);
         SysUser user = sysUserService.findOne(id);

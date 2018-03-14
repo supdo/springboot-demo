@@ -136,7 +136,7 @@
                                     if($this.userDlg.userForm.id === '') {
                                         $this.listData.unshift(data.items.newObj);
                                     }else{
-                                        $this.listData[$this.userDlg.index] = data.items.newObj;
+                                        $this.$set($this.listData, $this.userDlg.index, data.items.newObj);
                                     }
                                 }else{
                                     $this.$message.error(data.msg);

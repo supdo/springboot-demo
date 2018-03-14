@@ -2,9 +2,7 @@ package com.supdo.sb.demo.entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -14,6 +12,7 @@ import javax.persistence.ManyToMany;
 public class BaseEntity {
 	
 	private LinkedHashMap<String, FormField> fields = new LinkedHashMap<String, FormField>();
+	private LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 
 	/**
 	 * 根据Entity的@FormMeta注解生成fields成员信息，以便在View层通过模板来自动生产表单的HTML代码。
@@ -48,6 +47,44 @@ public class BaseEntity {
 	
 	public BaseEntity initForm() {
 		return this.initForm(null);
+	}
+
+	public BaseEntity initMap(String exclude ){
+		return initMap("",exclude);
+	}
+
+	public BaseEntity initMap(String include , String exclude){
+		map.clear();
+		List<String> includes = Arrays.asList(include.split(","));
+		List<String> excludes = Arrays.asList(exclude.split(","));
+		Field[] myFields =  this.getClass().getDeclaredFields();
+		if(include.length() > 0) {
+			for (Field field : myFields) {
+				String name = field.getName();
+				if (includes.contains(name)) {
+					try {
+						field.setAccessible(true);
+						map.put(name, field.get(this));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}else{
+			for (Field field : myFields) {
+				String name = field.getName();
+				if (!excludes.contains(name)) {
+					try {
+						field.setAccessible(true);
+						map.put(name, field.get(this));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return this;
 	}
 
 	/**
@@ -133,11 +170,33 @@ public class BaseEntity {
 	 */
 	public BaseEntity initFieldErrors(BindingResult result) {
 		for (FieldError error : result.getFieldErrors()) {
-			fields.get(error.getField()).setError(error.getDefaultMessage());
+			if(fields.containsKey(error.getField())) {
+				fields.get(error.getField()).setError(error.getDefaultMessage());
+			}
 		}
 		return this;
 	}
-	
+
+	public boolean bindingHasError(BindingResult bindingResult, Class<?> group){
+		boolean result = false;
+		List<String> groupFields = new ArrayList<>();
+		Field[] myFields =  this.getClass().getDeclaredFields();
+		for (Field field : myFields) {
+			FormMeta meta = field.getAnnotation(FormMeta.class);
+			if(meta != null && (Arrays.asList(meta.groups()).contains(group) || group == null)){
+				groupFields.add(field.getName());
+			}
+		}
+		for (FieldError error : bindingResult.getFieldErrors()) {
+			if(groupFields.contains(error.getField())){
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+
+
 	public LinkedHashMap<String, FormField> getFields() {
 		return fields;
 	}
@@ -145,5 +204,12 @@ public class BaseEntity {
 	public void setFields(LinkedHashMap<String, FormField> fields) {
 		this.fields = fields;
 	}
-	
+
+	public LinkedHashMap<String, Object> getMap() {
+		return map;
+	}
+
+	public void setMap(LinkedHashMap<String, Object> map) {
+		this.map = map;
+	}
 }

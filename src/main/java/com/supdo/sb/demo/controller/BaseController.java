@@ -1,5 +1,6 @@
 package com.supdo.sb.demo.controller;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,10 @@ public class BaseController {
     protected String tpl = "default";
 
     protected Result result = new Result(false, "初始化");
+
+    public BaseController() {
+
+    }
 
     protected String render(String filename) {
         return String.format("%s/%s", this.tpl, filename);
@@ -94,5 +99,7 @@ public class BaseController {
         public void removeItem(String key){
             this.items.remove(key);
         }
+
+        public void clearItems(){this.items.clear();}
     }
 }

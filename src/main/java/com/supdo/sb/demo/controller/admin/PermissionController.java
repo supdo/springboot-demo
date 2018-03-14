@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class PermissionController extends BaseController {
     @GetMapping("/list")
     @Transactional
     public String listView(Map<String, Object> map) {
+        result.clearItems();
         List<SysPermission> permissions = sysPermissionService.findAll();
         map.put("permissions", permissions);
 
@@ -35,23 +37,29 @@ public class PermissionController extends BaseController {
     @PostMapping("/save")
     @ResponseBody
     public Result save(@Validated(SysPermission.IPermission.class) SysPermission permissionForm, BindingResult bindingResult){
+        result.clearItems();
         permissionForm.initForm(SysPermission.IPermission.class);
         if(bindingResult.hasErrors()){
             this.result.simple(false, "字段校验失败！");
-            this.result.putItems("role", permissionForm.initFieldErrors(bindingResult));
+            this.result.putItems("permission", permissionForm.initFieldErrors(bindingResult));
         }else{
+            SysPermission newObj = null;
             if(permissionForm.getId() == null){
-                SysPermission newObj = sysPermissionService.save(permissionForm);
+                newObj = sysPermissionService.save(permissionForm);
                 this.result.simple(true, "保存成功！");
-                this.result.putItems("newObj", newObj);
+
             }else{
                 SysPermission role = sysPermissionService.findOne(permissionForm.getId());
                 role.merge(permissionForm);
-                SysPermission newObj = sysPermissionService.save(role);
+                newObj = sysPermissionService.save(role);
                 this.result.simple(true, "保存成功！");
-                this.result.putItems("newObj", newObj);
             }
-            this.result.putItems("permission", permissionForm);
+            //处理前台权限列表
+            if(newObj != null) {
+                newObj.initMap("roleSet");
+            }
+            this.result.putItems("newObj", newObj.getMap());
+            //this.result.putItems("permission", permissionForm);
         }
         return result;
     }
@@ -59,6 +67,7 @@ public class PermissionController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id){
+        result.clearItems();
         if(sysPermissionService.countRoleList(id)>0){
             this.result.simple(false, "此权限有角色在使用，不能删除！");
         }else {

@@ -142,7 +142,6 @@
                                         $this.listData.unshift(data.items.newObj);
                                     }else{
                                         $this.$set($this.listData, $this.roleDlg.index, data.items.newObj);
-                                        //$this.listData[] = JSON.parse(JSON.stringify(data.items.newObj));
                                     }
                                 } else {
                                     $this.$message.error(data.msg);
