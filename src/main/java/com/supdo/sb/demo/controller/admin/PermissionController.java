@@ -23,7 +23,6 @@ public class PermissionController extends BaseController {
     @GetMapping("/list")
     @Transactional
     public String listView(Map<String, Object> map) {
-        result.clearItems();
         List<SysPermission> permissions = sysPermissionService.findAll();
         map.put("permissions", permissions);
 
@@ -37,7 +36,6 @@ public class PermissionController extends BaseController {
     @PostMapping("/save")
     @ResponseBody
     public Result save(@Validated(SysPermission.IPermission.class) SysPermission permissionForm, BindingResult bindingResult){
-        result.clearItems();
         permissionForm.initForm(SysPermission.IPermission.class);
         if(bindingResult.hasErrors()){
             this.result.simple(false, "字段校验失败！");
@@ -67,7 +65,6 @@ public class PermissionController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id){
-        result.clearItems();
         if(sysPermissionService.countRoleList(id)>0){
             this.result.simple(false, "此权限有角色在使用，不能删除！");
         }else {

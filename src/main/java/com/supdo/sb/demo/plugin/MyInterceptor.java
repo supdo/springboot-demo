@@ -7,6 +7,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.supdo.sb.demo.controller.BaseController;
+
+import java.lang.reflect.Method;
+
 public class MyInterceptor implements HandlerInterceptor {
     //在请求处理之前进行调用（Controller方法调用之前
     @Override
@@ -27,6 +31,18 @@ public class MyInterceptor implements HandlerInterceptor {
         System.out.println("afterCompletion被调用");
         HandlerMethod method=(HandlerMethod) handler;
         Object controller = method.getBean();
-
+        Class<?> superClass =  controller.getClass().getSuperclass();
+        if(!superClass.equals(BaseController.class)){
+            superClass = superClass.getSuperclass();
+            if(!superClass.equals(BaseController.class)){
+                superClass = superClass.getSuperclass();
+            }
+        }
+        if(superClass == null || !superClass.equals(BaseController.class)){
+            return;
+        }else{
+            Method clearResult = superClass.getMethod("clearResult");
+            clearResult.invoke(controller);
+        }
     }
 }

@@ -29,7 +29,6 @@ public class RoleController extends BaseController {
     @GetMapping("/list")
     @Transactional
     public String listView(Map<String, Object> map) {
-        result.clearItems();
         List<SysRole> roles = sysRoleService.findAll();
         map.put("roles", roles);
 
@@ -53,7 +52,6 @@ public class RoleController extends BaseController {
     @PostMapping("/save")
     @ResponseBody
     public Result save(@Validated(SysRole.IRole.class) SysRole roleForm, BindingResult bindingResult){
-        result.clearItems();
         roleForm.initForm(SysRole.IRole.class);
         if(bindingResult.hasErrors()){
             this.result.simple(false, "字段校验失败！");
@@ -88,7 +86,6 @@ public class RoleController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id){
-        result.clearItems();
         if(sysRoleService.countUserList(id)>0){
             this.result.simple(false, "此角色有用户在使用，不能删除！");
         }else {
@@ -102,7 +99,6 @@ public class RoleController extends BaseController {
     @ResponseBody
     @Transactional
     public Result setPermission(@PathVariable Long id, @RequestParam Map<String, String> param){
-        result.clearItems();
         List<Long> ids = StringUtility.toList(param.get("permissions"));
         List<SysPermission> newPermissions = sysPermissionService.findAll(ids);
         SysRole role = sysRoleService.findOne(id);

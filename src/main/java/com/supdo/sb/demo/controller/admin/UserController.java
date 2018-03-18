@@ -32,7 +32,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/list")
     public String listView(Map<String, Object> map) {
-        result.clearItems();
+        //result.clearItems();
         List<SysUser> users = sysUserService.findAll();
         map.put("users", users);
 
@@ -57,7 +57,7 @@ public class UserController extends BaseController {
     @ResponseBody
     public Result save(@Validated({SysUser.IUser.class}) SysUser userForm, BindingResult bindingResult,
                        HttpServletRequest request, HttpServletResponse reponse) {
-        result.clearItems();
+        //result.clearItems();
         userForm.initForm(SysUser.IUser.class);
         if (bindingResult.hasErrors() && userForm.bindingHasError(bindingResult, SysUser.IUser.class)) {
             this.result.simple(false, "校验失败！");
@@ -101,7 +101,7 @@ public class UserController extends BaseController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public Result delete(@PathVariable Long id) {
-        result.clearItems();
+        //result.clearItems();
         sysUserService.delete(id);
         this.result.simple(true, "删除成功！");
         return result;
@@ -121,7 +121,7 @@ public class UserController extends BaseController {
     @ResponseBody
     @Transactional
     public Result setRole(@PathVariable Long id, @RequestParam Map<String, String> param){
-        result.clearItems();
+        //result.clearItems();
         List<Long> ids = StringUtility.toList(param.get("roles"));
         List<SysRole> newRoles = sysRoleService.findAll(ids);
         SysUser user = sysUserService.findOne(id);

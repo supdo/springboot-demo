@@ -17,6 +17,11 @@ public class BaseController {
         return String.format("%s/%s", this.tpl, filename);
     }
 
+    public void clearResult(){
+        result = new Result(false, "", "", "", 0);
+        //result.clearItems();
+    }
+
     /**
      * Result类
      *
@@ -37,6 +42,14 @@ public class BaseController {
         public Result(boolean flag, String msg) {
             super();
 
+        }
+
+        public Result(boolean flag, String msg, String html, String url, int sleep) {
+            this.flag = flag;
+            this.msg = msg;
+            this.html = html;
+            this.url = url;
+            this.sleep = sleep;
         }
 
         public Result simple(boolean flag, String msg) {
