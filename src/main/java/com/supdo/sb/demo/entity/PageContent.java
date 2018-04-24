@@ -6,14 +6,17 @@ import java.io.Serializable;
 @Entity
 @Table(name="page_content")
 public class PageContent  extends BaseEntity implements Serializable {
+
+
+    private static final long serialVersionUID = 7669998332146444598L;
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable=false, length=100)
+    @Column(nullable=false, length=200)
     private String title;
 
-    @Column(nullable=false, length=100)
+    @Column(nullable=false, length=200)
     private String url;
 
     @Column(nullable=false)

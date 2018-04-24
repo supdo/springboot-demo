@@ -7,18 +7,29 @@ import java.io.Serializable;
 @Table(name="page_list")
 public class PageList extends BaseEntity implements Serializable {
 
+    private static final long serialVersionUID = 3023193796058955329L;
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable=false, length=100)
+    @Column(nullable=false, length=200)
     private String title;
 
-    @Column(nullable=false, length=100)
+    @Column(nullable=false, length=200)
     private String url;
 
-    @Column(nullable=true, length=100)
+    @Column(nullable=false, length=200)
     private String pUrl;
+
+    @Column(nullable=false)
+    private String content = "尚未抓取";
+
+    @Column(nullable=false)
+    private boolean isGrab = false;
+
+    @Column(nullable=false)
+    private boolean isPost = false;
 
     public Long getId() {
         return id;
@@ -50,5 +61,29 @@ public class PageList extends BaseEntity implements Serializable {
 
     public void setpUrl(String pUrl) {
         this.pUrl = pUrl;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public boolean isGrab() {
+        return isGrab;
+    }
+
+    public void setGrab(boolean grab) {
+        isGrab = grab;
+    }
+
+    public boolean isPost() {
+        return isPost;
+    }
+
+    public void setPost(boolean post) {
+        isPost = post;
     }
 }
