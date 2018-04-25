@@ -2,6 +2,7 @@ package com.supdo.sb.demo.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Time;
 
 @Entity
 @Table(name="page_list")
@@ -13,17 +14,26 @@ public class PageList extends BaseEntity implements Serializable {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable=false, length=20)
+    private Long site;
+
     @Column(nullable=false, length=200)
     private String title;
+
+    @Column(length=100)
+    private String author;
 
     @Column(nullable=false, length=200)
     private String url;
 
-    @Column(nullable=false, length=200)
-    private String pUrl;
-
     @Column(nullable=false)
     private String content = "尚未抓取";
+
+    @Column(nullable=false, length=100)
+    private String tags = " ";
+
+    @Column()
+    private Time date;
 
     @Column(nullable=false)
     private boolean isGrab = false;
@@ -39,12 +49,28 @@ public class PageList extends BaseEntity implements Serializable {
         this.id = id;
     }
 
+    public Long getSite() {
+        return site;
+    }
+
+    public void setSite(Long site) {
+        this.site = site;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getUrl() {
@@ -55,20 +81,28 @@ public class PageList extends BaseEntity implements Serializable {
         this.url = url;
     }
 
-    public String getpUrl() {
-        return pUrl;
-    }
-
-    public void setpUrl(String pUrl) {
-        this.pUrl = pUrl;
-    }
-
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public Time getDate() {
+        return date;
+    }
+
+    public void setDate(Time date) {
+        this.date = date;
     }
 
     public boolean isGrab() {

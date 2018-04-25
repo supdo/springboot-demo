@@ -185,6 +185,12 @@
                         role: {title: '角色管理', icon: '', url: '/role/list'},
                         permission: {title: '权限管理', icon: '', url: '/permission/list'}
                     }
+                },
+                spider: {
+                    title: '爬虫', icon: '', children: {
+                        user: {title: '页面列表', icon: '', url: '/spider/list'},
+                        role: {title: '规则管理', icon: '', url: '/spiderRule/list'}
+                    }
                 }
             },
             asideMenu: {},

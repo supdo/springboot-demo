@@ -8,14 +8,25 @@ import java.io.Serializable;
 @Table(name="spider_rule")
 public class SpiderRule  extends BaseEntity implements Serializable {
     private static final long serialVersionUID = -3862217391060387164L;
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Size(min=5, max=200, groups={ISpiderRule.class})
-    @FormMeta(label="地址", required=true, placeholder="地址", groups= {ISpiderRule.class})
+    @Size(min=1, max=200, groups={ISpiderRule.class})
+    @FormMeta(label="规则编码", required=true, placeholder="规则编码", groups= {ISpiderRule.class})
     @Column(nullable=false, length=200)
-    private String pUrl;
+    private String code;
+
+    @Size(min=1, max=200, groups={ISpiderRule.class})
+    @FormMeta(label="规则名称", required=true, placeholder="规则名称", groups= {ISpiderRule.class})
+    @Column(nullable=false, length=200)
+    private String name;
+
+    @Size(max=200, groups={ISpiderRule.class})
+    @FormMeta(label="分页", placeholder="分页", groups= {ISpiderRule.class})
+    @Column(nullable=false, length=200)
+    private String pages;
 
     @Size(min=1, max=200, groups={ISpiderRule.class})
     @FormMeta(label="列表", required=true, placeholder="列表", groups= {ISpiderRule.class})
@@ -40,7 +51,43 @@ public class SpiderRule  extends BaseEntity implements Serializable {
     @Size(min=1, max=200, groups={ISpiderRule.class})
     @FormMeta(label="标签", required=true, placeholder="标签", groups= {ISpiderRule.class})
     @Column(nullable=false, length=200)
-    private String Tag = " ";
+    private String tag = " ";
+
+    @FormMeta(type= FormMeta.FormType.redio, label="生效", required=true, placeholder="生效", groups= {ISpiderRule.class})
+    @Column(nullable=false)
+    private boolean valid = true;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPages() {
+        return pages;
+    }
+
+    public void setPages(String pages) {
+        this.pages = pages;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
 
     public interface ISpiderRule {}
 
@@ -50,14 +97,6 @@ public class SpiderRule  extends BaseEntity implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getpUrl() {
-        return pUrl;
-    }
-
-    public void setpUrl(String pUrl) {
-        this.pUrl = pUrl;
     }
 
     public String getList() {
@@ -93,10 +132,10 @@ public class SpiderRule  extends BaseEntity implements Serializable {
     }
 
     public String getTag() {
-        return Tag;
+        return tag;
     }
 
     public void setTag(String tag) {
-        Tag = tag;
+        this.tag = tag;
     }
 }

@@ -13,7 +13,7 @@ import java.lang.annotation.ElementType;
 public @interface FormMeta {
 	
 	public enum FormType {
-		text, email, password, textarea, select
+		text, email, password, textarea, select, redio
 	}
 	
 	FormType type() default FormType.text;

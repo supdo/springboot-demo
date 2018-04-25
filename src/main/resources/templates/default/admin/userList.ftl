@@ -72,7 +72,7 @@
         data: {
             listData: [
                 <#list users as user>
-                    { id: '${user.id?c}', username: '${user.username?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list myRoles[user.id?c]![] as role_id>'${role_id?c}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
+                    { id: '${user.id?c}', username: '${user['username']?js_string}', nickname: '${user.nickname?js_string}', myRoles: [<#list myRoles[user.id?c]![] as role_id>'${role_id?c}'<#sep>,</#sep></#list>] }<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false,

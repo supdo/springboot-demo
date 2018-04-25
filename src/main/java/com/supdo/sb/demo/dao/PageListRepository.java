@@ -10,8 +10,6 @@ public interface PageListRepository extends JpaRepository<PageList, Long> {
 
     List<PageList> findByUrl(String url);
 
-    List<PageList> findByPUrl(String url);
+    List<PageList> findBySite(Long site);
 
-    @Query(value="select distinct pl.p_url from page_list pl", nativeQuery = true)
-    List findDistinctPUrl();
 }

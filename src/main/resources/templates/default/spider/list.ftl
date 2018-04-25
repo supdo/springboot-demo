@@ -11,11 +11,17 @@
         #main {
             margin: 10px;
         }
-        .btn-add-url {
+        .btn-add-site {
             font-size: 20px; cursor: pointer; height: 24px; margin: 0 5px; vertical-align: middle;
         }
-        .btn-add-url:hover {
+        .btn-add-site:hover{
             color: #2b85e4;
+        }
+        .btn-delete-site{
+            font-size: 20px; cursor: pointer; height: 20px; margin: 0 5px; vertical-align: middle; color: #999999;
+        }
+        .btn-delete-site:hover {
+            color: #990000;
         }
         .el-dialog__body {
             padding: 10px 15px 0 15px;
@@ -26,23 +32,26 @@
 <#import "/default/lib/form.ftl" as mf>
 <div id="main" v-cloak>
     <el-form ref="TopForm" :model="TopForm" :inline="true" :model="formInline" size="small">
-        <el-form-item label="列表地址" prop="url" :rules="{ required: true, message: '地址不能为空'}">
-            <el-select v-model="TopForm.url" filterable placeholder="请选择地址" requ style="width: 360px;">
-                <el-option  v-for="item in pUrls" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        <el-form-item label="网站列表" prop="site" :rules="{ required: true, message: '网站不能为空'}">
+            <el-select v-model="TopForm.site" filterable placeholder="请选择网站" style="width: 360px;">
+                <el-option  v-for="(item, index) in sites" :key="item.value" :label="item.label" :value="item.value">
+                    <span style="float: left">{{ item.label }}</span>
+                    <span style="float: right; margin-right:-16px;"><i class="el-icon-circle-close btn-delete-site" @click="deleteSite(index);"></i></span>
+                </el-option>
             </el-select>
-            <i class="el-icon-circle-plus btn-add-url" @click="ruleDlg.visible = true;"></i>
+            <i class="el-icon-circle-plus btn-add-site" @click="siteDlg.visible = true;"></i>
         </el-form-item>
         <el-checkbox v-model="TopForm.force">强制更新</el-checkbox>
         <el-button @click="handleGetPL()" type="primary" size="small">抓取页面列表</el-button>
         <el-button @click="handlePostAll()" type="primary" size="small">发送整个列表</el-button>
     </el-form>
-    <el-dialog :title="ruleDlg.title" :visible.sync="ruleDlg.visible" top="30px" width="500px">
-        <el-form ref="ruleForm" :model="ruleDlg.ruleForm" label-width="80px" size="small">
-            <@mf.Hform items=rule.fields formData='ruleDlg.ruleForm' refName='ruleForm' />
+    <el-dialog :title="siteDlg.title" :visible.sync="siteDlg.visible" top="30px" width="500px">
+        <el-form ref="siteForm" :model="siteDlg.siteForm" label-width="80px" size="small">
+            <@mf.Hform items=siteForm.fields formData='siteDlg.siteForm' refName='siteForm' itemOptions='siteOptions' />
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button @click="ruleDlg.visible = false" size="small">取 消</el-button>
-            <el-button :loading="ruleDlg.okBtnLoading" type="primary" @click="handleAddRule()" size="small">保 存</el-button>
+            <el-button @click="siteDlg.visible = false" size="small">取 消</el-button>
+            <el-button :loading="siteDlg.okBtnLoading" type="primary" @click="handleAddSite()" size="small">保 存</el-button>
         </div>
     </el-dialog>
     <el-table :data="listData" border style="width: 100%" size="small"
@@ -81,58 +90,92 @@
     var main = new Vue({
         el: '#main',
         data: {
-            TopForm: {url: '', force: false},
-            pUrls: [
-                <#list lsr![] as sr>
-                    {value: '${sr.pUrl}', label: '${sr.pUrl}'}<#sep>,</#sep>
+            TopForm: {site: '', force: false},
+            sites: [
+                <#list siteList![] as site>
+                    {id: '${site.id}', value: '${site.id}', label: '${site.name}(${site.url})'}<#sep>,</#sep>
                 </#list>
             ],
-            ruleDlg: {
+            siteDlg: {
                 visible: false,
                 index: -1,
-                title: '添加规则',
+                title: '添加网站',
                 okBtnLoading: false,
-                ruleForm: {pUrl: '', list: '', title: '', url: '', content: '', tags: ''}
+                siteForm: {}
             },
+            siteModel: {id: '', <#list siteForm.fields?keys as key>${key}: ''<#sep>, </#sep></#list>},
+            siteOptions:{ <#list siteForm.fields?keys as key><#if siteForm.fields[key].type == 'select'>
+                ${key}: {<#list siteForm.fields[key].options?keys as val>${val}: '${siteForm.fields[key].options[val]}'<#sep>, </#sep></#list>}
+                <#sep>, </#sep></#if></#list> },
             listData: [
                 <#list apl![] as pl>
-                    { id: '${pl.id!"#"}', title: '${pl.title?js_string}', url: '${pl.url?js_string}', grab: ${pl.isGrab?js_string}, post: ${pl.isPost?js_string}}<#sep>,</#sep>
+                    { id: '${pl['id']!"#"}', title: '${pl.title?js_string}', url: '${pl.url?js_string}', grab: ${pl.isGrab?js_string}, post: ${pl.isPost?js_string}}<#sep>,</#sep>
                 </#list>
             ],
             tableLoading: false
         },
         methods: {
-            handleAddRule:function() {
+            handleAddSite:function() {
                 var $this = this;
-                this.$refs.ruleForm.validate(function(valid) {
+                this.$refs.siteForm.validate(function(valid) {
                     if (valid) {
-                        $this.ruleDlg.okBtnLoading = true;
-                        myPost('/spider/AddRule', $this.ruleDlg.ruleForm,
+                        $this.siteDlg.okBtnLoading = true;
+                        myPost('/spider/addSite', $this.siteDlg.siteForm,
                                 function(data){
                                     if(data.flag){
                                         $this.$message.success(data.msg);
-                                        $this.ruleDlg.visible = false;
-                                        $this.pUrls.push({value: $this.ruleDlg.ruleForm.pUrl, label: $this.ruleDlg.ruleForm.pUrl});
-                                        $this.TopForm.url = $this.ruleDlg.ruleForm.pUrl;
+                                        $this.siteDlg.visible = false;
+                                        $this.siteDlg.siteForm = {};
+                                        var site = data.items.site;
+                                        $this.sites.push({value: site.id, label: site.name+"("+site.url+")"});
                                     }else{
                                         $this.$message.error(data.msg);
-                                        var rules = data.items.rule.fields;
+                                        var rules = data.items.site.fields;
                                         $this.$nextTick(function() {
                                             for(var key in rules) {
-                                                $this.$refs['ruleForm_' + key].error = rules[key]['error'];
+                                                $this.$refs['siteDlg_' + key].error = rules[key]['error'];
                                             }
                                         });
                                     }
-                                    //$this.ruleDlg.okBtnLoading = false;
                                 },
                                 function(req, textStatus){
                                     $this.$message.error(textStatus);
-                                    //$this.ruleDlg.okBtnLoading = false;
                                 },
                                 function(req, textStatus){
-                                    $this.ruleDlg.okBtnLoading = false;
+                                    $this.siteDlg.okBtnLoading = false;
                                 }
                         );
+                    }
+                });
+            },
+            deleteSite: function(index) {
+                var $this = this;
+                $this.$confirm('确认要删除“'+$this.sites[index].label+'”么？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    callback: function (action, instance) {
+                        if (action == 'confirm') {
+                            myPost('/spider/deleteSite/' + $this.sites[index].id, {},
+                                    function (data) {
+                                        if (data.flag) {
+                                            $this.$message.success(data.msg);
+                                            if($this.TopForm.site == $this.sites[index].value){
+                                                $this.TopForm.site = "";
+                                            }
+                                            $this.sites.splice(index, 1);
+                                        } else {
+                                            $this.$message.error(data.msg);
+                                        }
+                                    },
+                                    function (req, textStatus) {
+                                        $this.$message.error(textStatus);
+                                    },
+                                    function (req, textStatus) {
+                                        $this.tableLoading = false;
+                                    }
+                            );
+                        }
                     }
                 });
             },
@@ -209,7 +252,7 @@
             handlePostAll: function() {
                 var $this = this;
                 $this.tableLoading = true;
-                myPost('/spider/PostZootopia/all', $this.TopForm,
+                myPost('/spider/PostZootopia/all/'+$this.TopForm.site, {},
                         function(data){
                             if(data.flag){
                                 $this.$message.success(data.msg);

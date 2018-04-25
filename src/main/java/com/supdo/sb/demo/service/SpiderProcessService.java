@@ -3,8 +3,10 @@ package com.supdo.sb.demo.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.supdo.sb.demo.dao.PageListRepository;
+import com.supdo.sb.demo.dao.SiteListRepository;
 import com.supdo.sb.demo.dao.SpiderRuleRepository;
 import com.supdo.sb.demo.entity.PageList;
+import com.supdo.sb.demo.entity.SiteList;
 import com.supdo.sb.demo.entity.SpiderRule;
 import com.supdo.sb.demo.plugin.MyRedisManager;
 import org.jsoup.Connection;
@@ -28,12 +30,16 @@ public class SpiderProcessService extends BaseService{
     @Autowired
     private MyRedisManager myRedisManager;
     @Autowired
+    private SiteListRepository siteListRepository;
+    @Autowired
     private PageListRepository pageListRepository;
     @Autowired
     private SpiderRuleRepository spiderRuleRepository;
 
-    public List getDistinctPUrl(){
-        return pageListRepository.findDistinctPUrl();
+    Map<String, String> zootopiaTag = new HashMap<>();
+
+    public SpiderProcessService() {
+        this.zootopiaTag.put("java", "53");
     }
 
     public ArrayList<PageList> processList(Document doc){
@@ -51,66 +57,69 @@ public class SpiderProcessService extends BaseService{
         return apl;
     }
 
-    public ArrayList<PageList> processList(String plUrl){
-        ArrayList<PageList> apl = new ArrayList<PageList>();
-        List<SpiderRule> lsr = spiderRuleRepository.findByPUrl(plUrl);
-        if(lsr.size()==0){
-            return apl;
-        }
-        SpiderRule sr = lsr.get(0);
+    public Result processSite(Long siteId){
+        List<PageList> lpl = new ArrayList<>();
+        SiteList siteList = siteListRepository.findOne(siteId);
+        SpiderRule sr = spiderRuleRepository.findOne(siteList.getRule());
         try {
-            Document doc = Jsoup.connect(plUrl).get();
+            List<String> pages = new ArrayList<>();
+            Document doc = Jsoup.connect(siteList.getUrl()).get();
+            if(sr.getPages() != null && sr.getPages().length()>0){
+                Elements pageList = doc.select(sr.getPages());
+                for(Element ele : pageList){
+                    pages.add(ele.attr("href"));
+                }
+            }
+            if(!pages.contains(siteList.getUrl())){
+                pages.add(siteList.getUrl());
+            }
+            lpl = this.processList(pages, sr, siteList);
+            result.simple(true, "获取成功");
+            result.putItem("pageList", lpl);
+        } catch (IOException e){
+            e.printStackTrace();
+            result.simple(false, e.getMessage());
+        }
+        return result;
+    }
+
+    public List<PageList> processList(List<String> pages, SpiderRule sr, SiteList siteList) throws IOException {
+        List<PageList> lpl = new ArrayList<PageList>();
+        for(String pageUrl : pages) {
+            Document doc = Jsoup.connect(pageUrl).get();
             //提取数据
             Elements eleList = doc.select(sr.getList());
-            for(Element ele : eleList){
+            for (Element ele : eleList) {
                 PageList pl = new PageList();
                 String url = ele.select(sr.getUrl()).first().attr("href");
                 String title = ele.select(sr.getTitle()).first().text();
                 pl.setUrl(url);
                 pl.setTitle(title);
-                pl.setpUrl(plUrl);
-                if(pageListRepository.findByUrl(url).size()==0) {
+                pl.setSite(siteList.getId());
+                if (pageListRepository.findByUrl(url).size() == 0) {
                     pl = pageListRepository.save(pl);
                 }
-                apl.add(pl);
+                lpl.add(pl);
             }
-        } catch (IOException e){
-            e.printStackTrace();
         }
-//        try {
-//            Document doc = Jsoup.connect(plUrl).get();
-//            //提取数据
-//            Elements eleList = doc.select("ul.blog-units.blog-units-box > li.blog-unit");
-//            for(Element ele : eleList){
-//                PageList pl = new PageList();
-//                String url = ele.select("a").first().attr("href");
-//                String title = ele.select("a > h3").first().text();
-//                pl.setUrl(url);
-//                pl.setTitle(title);
-//                pl.setpUrl(plUrl);
-//                if(pageListRepository.findByUrl(url).size()==0) {
-//                    pl = pageListRepository.save(pl);
-//                }
-//                apl.add(pl);
-//            }
-//        } catch (IOException e){
-//            e.printStackTrace();
-//        }
-        return apl;
+        return lpl;
     }
 
-    public Result processContent(Long id){
-        PageList pc = pageListRepository.findOne(id);
-        List<SpiderRule> lsr = spiderRuleRepository.findByPUrl(pc.getpUrl());
-        if(lsr.size()==0){
-            return result.simple(false, "抓取规则未配置");
-        }
-        SpiderRule sr = lsr.get(0);
+    public Result processContent(Long pageId){
+        PageList pc = pageListRepository.findOne(pageId);
+        SiteList siteList = siteListRepository.findOne(pc.getSite());
+        SpiderRule sr = spiderRuleRepository.findOne(siteList.getRule());
         try {
             Document doc = Jsoup.connect(pc.getUrl()).get();
-            pc.setContent(doc.select(sr.getContent()).first().html());
-//            Element ele = doc.select("main > article").first();
-//            pc.setContent(ele.select("div#article_content").first().html());
+            Elements contentEle = doc.select(sr.getContent());
+            if(contentEle.size()>0){
+                pc.setContent(contentEle.first().html());
+            }else{
+                result.simple(false, "没有获取内容区域");
+                return result;
+            }
+            String content = doc.select(sr.getContent()).first().html();
+            pc.setContent(content);
             pc.setGrab(true);
             pc = pageListRepository.save(pc);
             result.simple(true, "获取成功");

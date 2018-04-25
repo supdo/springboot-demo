@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface SpiderRuleRepository extends JpaRepository<SpiderRule, Long> {
 
-    List<SpiderRule> findByPUrl(String pUrl);
+    List<SpiderRule> findAllByValid(boolean valid);
+
 }
