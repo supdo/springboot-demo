@@ -42,23 +42,7 @@ public class SpiderProcessService extends BaseService{
         this.zootopiaTag.put("java", "53");
     }
 
-    public ArrayList<PageList> processList(Document doc){
-        ArrayList<PageList> apl = new ArrayList<PageList>();
-        //提取数据
-        Elements eleList = doc.select("ul.blog-units.blog-units-box > li.blog-unit");
-        for(Element ele : eleList){
-            PageList pl = new PageList();
-            String url = ele.select("a").first().attr("href");
-            String title = ele.select("a > h3").first().text();
-            pl.setUrl(url);
-            pl.setTitle(title);
-            apl.add(pl);
-        }
-        return apl;
-    }
-
     public Result processSite(Long siteId){
-        List<PageList> lpl = new ArrayList<>();
         SiteList siteList = siteListRepository.findOne(siteId);
         SpiderRule sr = spiderRuleRepository.findOne(siteList.getRule());
         try {
@@ -73,7 +57,7 @@ public class SpiderProcessService extends BaseService{
             if(!pages.contains(siteList.getUrl())){
                 pages.add(siteList.getUrl());
             }
-            lpl = this.processList(pages, sr, siteList);
+            List<PageList> lpl = this.processList(pages, sr, siteList);
             result.simple(true, "获取成功");
             result.putItem("pageList", lpl);
         } catch (IOException e){
@@ -173,19 +157,6 @@ public class SpiderProcessService extends BaseService{
         Response res2 = conn2.method(Connection.Method.POST).execute();
         String body2 = res2.body();
 
-//        String homeUrl = "http://www.zootopia.unicom.local/";
-//        Connection conn3 = Jsoup.connect(homeUrl);
-//        //conn3.cookie("JSESSIONID", res.cookie("JSESSIONID"));
-//        conn3.cookie("topiassid", res2.cookie("topiassid"));
-//        conn3.cookie("ztunissid", res2.cookie("ztunissid"));
-//        conn3.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-//        conn3.header("Content-Type", "application/x-www-form-urlencoded");
-//        conn3.header("Host","www.zootopia.unicom.local");
-//        conn3.header("Origin", "http://www.zootopia.unicom.local");
-//        conn3.header("Referer", "http://www.zootopia.unicom.local/u/login/form/");
-//        conn3.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
-//        Response res3 = conn3.method(Connection.Method.GET).execute();
-//        String body3 = res3.body();
         //获得LtpaToken
         String[] tokens =  ltpa.split(";")[0].split("=");
         //res2.cookie(tokens[0], tokens[1]);

@@ -11,6 +11,7 @@ import com.supdo.sb.demo.service.SpiderProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -39,23 +40,6 @@ public class SpiderController extends BaseController {
 
     @GetMapping("/list")
     public String mainView(Map<String, Object> map) {
-        //Spider.create(new GithubRepoPageProcessor()).addUrl("https://github.com/code4craft").thread(5).run();
-        //Spider.create(githubRepoPageProcessor).addUrl("https://blog.csdn.net/nongshuqiner/").thread(5).run();
-        //Spider spider = Spider.create(githubRepoPageProcessor);
-        //ResultItems result = spider.get("https://blog.csdn.net/nongshuqiner/");
-
-//        String url = "https://blog.csdn.net/nongshuqiner/";
-//        ArrayList<PageList> apl = null;
-//        try {
-//            Document doc = Jsoup.connect(url).get();
-//            apl = spiderProcessService.processList(doc);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        map.put("apl",apl);
-        //List pUrls = spiderProcessService.getDistinctPUrl();
-        //map.put("pUrls", pUrls);
-
         LinkedHashMap<String, String> ruleOptions = new LinkedHashMap<>();
         List<SpiderRule> ruleList = spiderRuleRepository.findAllByValid(true);
         for(SpiderRule rule: ruleList){
@@ -94,26 +78,6 @@ public class SpiderController extends BaseController {
         this.result.simple(true, "删除成功！");
         return result;
     }
-
-//    @PostMapping("/AddRule")
-//    @ResponseBody
-//    public Result addRule(@Validated({SpiderRule.ISpiderRule.class}) SpiderRule ruleForm, BindingResult bindingResult) {
-//        ruleForm.initForm(SpiderRule.ISpiderRule.class);
-//        if(bindingResult.hasErrors()){
-//            this.result.simple(false, "校验失败！");
-//            this.result.putItems("rule", ruleForm.initFieldErrors(bindingResult));
-//        }else{
-////            if(spiderRuleRepository.findByPUrl(ruleForm.getpUrl()).size()>0){
-////                this.result.simple(false, "地址已存在！");
-////                ruleForm.getFields().get("pUrl").setError("此地址已存在！");
-////                this.result.putItems("rule", ruleForm);
-////            }else{
-////                spiderRuleRepository.save(ruleForm);
-////                this.result.simple(true, "保存成功！！");
-////            }
-//        }
-//        return result;
-//    }
 
     @PostMapping("/GetPL")
     @ResponseBody
