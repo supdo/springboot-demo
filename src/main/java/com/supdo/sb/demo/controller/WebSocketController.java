@@ -46,9 +46,9 @@ public class WebSocketController extends BaseController{
         JSONObject info = JSON.parseObject(message);
         //SysUser user = (SysUser)SecurityUtils.getSubject().getPrincipal();
         String name = principal.getName();
-//        simpMessagingTemplate.convertAndSendToUser(info.get("toUser").toString(),
-//                "/oto/notifications",
-//                String.format("%s：%s", principal.getName(), info.get("msg").toString()));
+        simpMessagingTemplate.convertAndSendToUser(info.get("toUser").toString(),
+                "/oto/notifications",
+                String.format("%s：%s", principal.getName(), info.get("msg").toString()));
         return result;
     }
 }
