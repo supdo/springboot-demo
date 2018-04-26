@@ -23,11 +23,7 @@ import com.supdo.sb.demo.entity.FormMeta.FormType;
 @Table(name="sys_user")
 public class SysUser extends BaseEntity implements Serializable{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6336110168482446523L;
-
+	private static final long serialVersionUID = 350787914736398871L;
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;

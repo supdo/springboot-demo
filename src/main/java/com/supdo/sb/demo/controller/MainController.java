@@ -36,7 +36,7 @@ public class MainController extends BaseController {
 		return render("test");
 	}
 	
-	//@RequiresAuthentication
+	@RequiresAuthentication
 	@RequestMapping({"/", "/default"})
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");

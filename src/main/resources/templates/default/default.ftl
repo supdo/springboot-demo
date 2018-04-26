@@ -188,8 +188,13 @@
                 },
                 spider: {
                     title: '爬虫', icon: '', children: {
-                        user: {title: '页面列表', icon: '', url: '/spider/list'},
-                        role: {title: '规则管理', icon: '', url: '/spiderRule/list'}
+                        list: {title: '页面列表', icon: '', url: '/spider/list'},
+                        rule: {title: '规则管理', icon: '', url: '/spiderRule/list'}
+                    }
+                },
+                websocket: {
+                    title: 'WebSocket', icon: '', children: {
+                        hello: {title: 'Hello', icon: '', url: '/websocket/hello'}
                     }
                 }
             },
