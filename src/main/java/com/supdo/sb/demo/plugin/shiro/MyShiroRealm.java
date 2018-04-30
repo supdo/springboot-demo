@@ -16,6 +16,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.supdo.sb.demo.entity.SysUser;
@@ -32,19 +33,29 @@ public class MyShiroRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 		String username = token.getUsername();
-		String password = String.valueOf(token.getPassword());
+		//String password = String.valueOf(token.getPassword());
 		SysUser user;
+		//String encryptPassword;
 		List<SysUser> users = sysUserService.getListByUsername(username);
 		if(users.size() == 0) {
 			throw new AccountException("无此用户名！");
 		}else {
 			user = users.get(0);
-			String encryptPassword = new SimpleHash("SHA-1", password, username).toString();
-			if(!user.getPassword().equals(encryptPassword)) {
-				throw new AccountException("密码有误！");
-			}
+//			encryptPassword = new SimpleHash("SHA-1", password, username).toString();
+//			if(!user.getPassword().equals(encryptPassword)) {
+//				throw new AccountException("密码有误！");
+//			}
 		}
-		return new SimpleAuthenticationInfo(user, password, getName());
+		setName("test_321");
+		//由shrio根据AuthenticationToken中的信息与SysUser的信息进行密码加密后的比对
+		SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+				//user,	//此处放user实例在controller中无法获得，因此放username
+				username,
+				user.getPassword(),
+				ByteSource.Util.bytes(user.getUsername()),
+				getName()
+		);
+		return authenticationInfo;
 	}
 	
 	/**

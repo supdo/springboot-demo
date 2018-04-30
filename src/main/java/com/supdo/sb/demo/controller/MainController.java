@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -40,6 +41,8 @@ public class MainController extends BaseController {
 	@RequestMapping({"/", "/default"})
 	public String defaultView(Map<String, Object> map) {
 		map.put("hello", "Hello World!");
+		//Object o = SecurityUtils.getSubject().getPrincipal();
+		//SysUser user = (SysUser)o;
 		//map.put("test", "test");
 		return render("default");
 	}
@@ -91,14 +94,17 @@ public class MainController extends BaseController {
 		}
 
 		if(result.isFlag()){
+			result.simple(false, "登录失败");
 			try {
 				UsernamePasswordToken token = new UsernamePasswordToken(userForm.getUsername(), userForm.getPassword());
 				SecurityUtils.getSubject().login(token);
 				result.simple(true, "登录成功");
+			} catch (IncorrectCredentialsException e) {
+				System.out.println(e.toString());
+				userForm.getFields().get("password").setError("密码有误！");
 			} catch (Exception e) {
 				System.out.println(e.toString());
 				userForm.getFields().get("password").setError(e.getMessage());
-				result.simple(false, "登录失败");
 			}
 		}
 		result.putItems("user", userForm);

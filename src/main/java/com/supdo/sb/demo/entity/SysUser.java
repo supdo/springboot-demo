@@ -2,6 +2,7 @@ package com.supdo.sb.demo.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -23,7 +24,7 @@ import com.supdo.sb.demo.entity.FormMeta.FormType;
 @Table(name="sys_user")
 public class SysUser extends BaseEntity implements Serializable{
 
-	private static final long serialVersionUID = 350787914736398871L;
+	//private static final long serialVersionUID = 350787914736398871L;
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
@@ -73,15 +74,24 @@ public class SysUser extends BaseEntity implements Serializable{
     )
     private Set<SysRole> roleSet;
 
-	public interface IUser {}
-    public interface IUserLogin {}
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SysUser sysUser = (SysUser) o;
+		return Objects.equals(id, sysUser.getId());
+	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	@Override
 	public String toString(){
-		return "";
+		return username;
 	}
-		
+
 	public Long getId() {
 		return id;
 	}
@@ -104,6 +114,14 @@ public class SysUser extends BaseEntity implements Serializable{
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getRePassword() {
+		return rePassword;
+	}
+
+	public void setRePassword(String rePassword) {
+		this.rePassword = rePassword;
 	}
 
 	public String getNickname() {
@@ -169,4 +187,10 @@ public class SysUser extends BaseEntity implements Serializable{
 	public void setRoleSet(Set<SysRole> roleSet) {
 		this.roleSet = roleSet;
 	}
+
+	public interface IUser {}
+    public interface IUserLogin {}
+
+
+
 }

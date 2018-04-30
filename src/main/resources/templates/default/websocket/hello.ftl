@@ -10,13 +10,16 @@
     <style type="text/css">
         #hello {
             width: 600px;
-            margin: 50px auto 0 auto;
+            margin: 10px auto 0 auto;
+        }
+        .hello-card {
+            margin-top: 50px;
         }
     </style>
 </head>
 <body>
 <div id="hello" v-cloak>
-    <el-card class="">
+    <el-card class="hello-card">
         <div slot="header" ><span class="card-title-text">广播</span> </div>
         <el-form :inline="true">
             <el-form-item>
@@ -33,7 +36,7 @@
             </el-form-item>
         </el-form>
     </el-card>
-    <el-card class="">
+    <el-card class="hello-card">
         <div slot="header" ><span class="card-title-text">点对点</span> </div>
         <el-form :inline="true" :model="chatFrom">
             <el-form-item label="用户">
@@ -49,7 +52,7 @@
                 <el-input v-model="chatFrom.msg" placeholder="消息"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="sendMsg();">发送</el-button>
+                <el-button type="primary" @click="sendMsgOne();">发送</el-button>
             </el-form-item>
         </el-form>
     </el-card>
@@ -69,6 +72,12 @@
             chatFrom: {
                 toUser: '',
                 msg: ''
+            },
+            headers: {
+                login: '${currentUserName}',
+                passcode: 'mypasscode',
+                // additional header
+                'client-id': 'my-client-id'
             }
         },
         methods: {
@@ -94,11 +103,11 @@
                 var socket = new SockJS('/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
-                    $this.stompClient.connect({}, function (frame) {
+                    $this.stompClient.connect($this.headers, function (frame) {
                         $this.connected = true;
                         console.log('Connected: ' + frame);
                         $this.stompClient.subscribe('/user/oto/notifications', function (data) {
-                            var dataBody = data.body;
+                            var dataBody = JSON.parse(data.body);
                             $this.$notify.info({
                                 title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
                             });
@@ -121,6 +130,15 @@
                     $this.$message.error('请先建立连接。');
                 }else{
                     $this.stompClient.send("/hello", {}, JSON.stringify($this.chatFrom));
+                    $this.chatFrom.msg = '';
+                }
+            },
+            sendMsgOne: function() {
+                var $this = this;
+                if($this.stompClient == null) {
+                    $this.$message.error('请先建立连接。');
+                }else{
+                    $this.stompClient.send("/sayToUser", {}, JSON.stringify($this.chatFrom));
                     $this.chatFrom.msg = '';
                 }
             }

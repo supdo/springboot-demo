@@ -3,6 +3,7 @@ package com.supdo.sb.demo.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -31,10 +32,22 @@ public class ShiroConfig {
 		shiroFilterFactoryBean.setSuccessUrl("/index");
 		// 未授权界面;
 		shiroFilterFactoryBean.setUnauthorizedUrl("/403");
+		//<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
 		
 		// 权限控制map.
 		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
+		// 配置不会被拦截的链接 顺序判断
+//		filterChainDefinitionMap.put("/static/**", "anon");
+//		filterChainDefinitionMap.put("/js/**", "anon");
+//		filterChainDefinitionMap.put("/css/**", "anon");
+//		filterChainDefinitionMap.put("/element/**", "anon");
+//		///VerifyCode
+//		filterChainDefinitionMap.put("/VerifyCode", "anon");
+//		//配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
+//		filterChainDefinitionMap.put("/logout", "logout");
+//		filterChainDefinitionMap.put("/**", "authc");
 		//filterChainDefinitionMap.put("/user", "perms[add1]");
+		filterChainDefinitionMap.put("/**", "anon");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		
 		return shiroFilterFactoryBean;
@@ -56,9 +69,20 @@ public class ShiroConfig {
 	@Bean
 	public MyShiroRealm myShiroRealm() {
 		MyShiroRealm myShiroRealm = new MyShiroRealm();
+		myShiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());
 		return myShiroRealm;
 	}
-	
+
+	@Bean
+	public HashedCredentialsMatcher hashedCredentialsMatcher(){
+		HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+
+		hashedCredentialsMatcher.setHashAlgorithmName("SHA-1");//散列算法:这里使用SHA-1算法;
+		hashedCredentialsMatcher.setHashIterations(1);//散列的次数，比如散列两次，相当于 SHA-1(SHA-1(""));
+
+		return hashedCredentialsMatcher;
+	}
+
 	/**
 	 * 配置shiro redisManager
 	 *
