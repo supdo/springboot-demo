@@ -27,6 +27,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 @RequiresAuthentication
 @Controller
@@ -40,23 +41,23 @@ public class WebSocketController extends BaseController{
     @Autowired
     private SimpUserRegistry userRegistry;
     @Autowired
-    SocketSessionRegistry webAgentSessionRegistry;
+    private SocketSessionRegistry webAgentSessionRegistry;
 
-    private MessageHeaders createHeaders(String sessionId) {
-        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-        headerAccessor.setSessionId(sessionId);
-        headerAccessor.setLeaveMutable(true);
-        return headerAccessor.getMessageHeaders();
-    }
+//    private MessageHeaders createHeaders(String sessionId) {
+//        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+//        headerAccessor.setSessionId(sessionId);
+//        headerAccessor.setLeaveMutable(true);
+//        return headerAccessor.getMessageHeaders();
+//    }
 
 
-    @RequiresAuthentication
+    //@RequiresAuthentication
     @GetMapping("/hello")
     public String helloView(Principal principal, Map<String, Object> map){
-        String username = principal.getName();
-        Subject subject = SecurityUtils.getSubject();
-        Object o = subject.getPrincipal();
-        map.put("currentUserName",username);
+//        String username = principal.getName();
+//        Subject subject = SecurityUtils.getSubject();
+//        Object o = subject.getPrincipal();
+//        map.put("currentUserName",username);
         return render("/websocket/hello");
     }
 
@@ -82,19 +83,26 @@ public class WebSocketController extends BaseController{
     public void sayToUser(Principal principal, String message){
         JSONObject info = JSON.parseObject(message);
         String username = principal.getName();
-
-        //这里没做校验
-        String sessionId=webAgentSessionRegistry.getSessionIds(info.get("toUser").toString()).stream().findFirst().get();
-
+        String toUser = info.get("toUser").toString();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date now = new Date();
-        result.simple(true,String.format("%s：%s", username, info.get("msg").toString(), format.format(now.getTime())));
-
+        //这里没做校验
+//        Set<String> sessionIds = webAgentSessionRegistry.getSessionIds(toUser);
+//        String sessionId = "";
+//        if(sessionIds.size() == 0){
+//            sessionId = webAgentSessionRegistry.getSessionIds(username).stream().findFirst().get();
+//            result.simple(true, String.format("%s没有上线；@%s", toUser, format.format(now.getTime())));
+//            toUser = username;
+//        } else {
+//            sessionId = sessionIds.stream().findFirst().get();
+//            result.simple(true, String.format("%s：%s；@%s", username, info.get("msg").toString(), format.format(now.getTime())));
+//        }
+        result.simple(true, String.format("%s：%s；@%s", username, info.get("msg").toString(), format.format(now.getTime())));
         simpMessagingTemplate.convertAndSendToUser(
-                info.get("toUser").toString(),
-                "/oto/notifications",
-                result,
-                createHeaders(sessionId)
+            toUser,
+            "/oto/notifications",
+            result
+            //createHeaders(sessionId)
         );
     }
 }

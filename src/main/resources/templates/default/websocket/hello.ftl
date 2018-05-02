@@ -72,12 +72,6 @@
             chatFrom: {
                 toUser: '',
                 msg: ''
-            },
-            headers: {
-                login: '${currentUserName}',
-                passcode: 'mypasscode',
-                // additional header
-                'client-id': 'my-client-id'
             }
         },
         methods: {
@@ -95,6 +89,11 @@
                                 title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
                             });
                         });
+                    },
+                    function(frame){
+                        $this.$notify.info({
+                            title: '来自服务器的消息', message: frame, showClose:true
+                        });
                     });
                 }
             },
@@ -103,7 +102,7 @@
                 var socket = new SockJS('/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
-                    $this.stompClient.connect($this.headers, function (frame) {
+                    $this.stompClient.connect({}, function (frame) {
                         $this.connected = true;
                         console.log('Connected: ' + frame);
                         $this.stompClient.subscribe('/user/oto/notifications', function (data) {
@@ -112,13 +111,20 @@
                                 title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
                             });
                         });
+                    },
+                    function(frame){
+                        $this.$notify.info({
+                            title: '来自服务器的消息', message: frame, showClose:true
+                        });
                     });
                 }
             },
             handleClose: function() {
                 var $this = this;
                 if ($this.stompClient != null) {
-                    $this.stompClient.disconnect();
+                    $this.stompClient.disconnect(function(){
+                        $this.$message.info('连接已关闭。');
+                    }, {});
                     $this.stompClient = null;
                 }
                 $this.connected = false;
@@ -132,6 +138,7 @@
                     $this.stompClient.send("/hello", {}, JSON.stringify($this.chatFrom));
                     $this.chatFrom.msg = '';
                 }
+
             },
             sendMsgOne: function() {
                 var $this = this;

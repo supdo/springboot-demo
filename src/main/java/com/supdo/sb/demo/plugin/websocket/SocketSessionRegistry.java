@@ -1,5 +1,6 @@
 package com.supdo.sb.demo.plugin.websocket;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
