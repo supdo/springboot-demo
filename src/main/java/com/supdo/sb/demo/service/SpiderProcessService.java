@@ -228,6 +228,7 @@ public class SpiderProcessService extends BaseService{
                 if ((Boolean) shareJson.get("result")) {
                     result.simple(true, "发送成功");
                     pc.setPost(true);
+                    pc.setPostId(shareJson.get("sh_id").toString());
                     pageListRepository.save(pc);
                 } else {
                     result.simple(false, (String)shareJson.get("msg"));

@@ -142,7 +142,7 @@ public class SpiderController extends BaseController {
                     }
                     if(postResult.isFlag()){
                         successCnt += 1;
-                        myResult.simple(true, "发送成功！");
+                        myResult.simple(true, String.format("发送成功！标题：%s；URL：%s", pl.getTitle(), pl.getUrl()));
                     }else{
                         String msg = String.format("发送失败，URL：%s，报错：%s", pl.getUrl(), postResult.getMsg());
                         logger.error(msg);

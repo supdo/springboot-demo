@@ -32,7 +32,7 @@ public class SiteList extends BaseEntity implements Serializable {
     @Column(nullable=false, length=200)
     private Long rule;
 
-    @FormMeta(label="标签", required=true, type = FormMeta.FormType.select, placeholder="标签", options={"53:java","57:python"}, groups= {ISiteList.class})
+    @FormMeta(label="标签", required=true, type = FormMeta.FormType.select, placeholder="标签", options={"53:java","57:python", "59:android",  "60:javascript", "72:oracle"}, groups= {ISiteList.class})
     @Column(nullable=true, length=200)
     private String tag;
 

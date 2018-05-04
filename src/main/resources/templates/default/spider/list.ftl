@@ -44,6 +44,7 @@
         <el-checkbox v-model="TopForm.force">强制更新</el-checkbox>
         <el-button @click="handleGetPL()" type="primary" size="small">抓取页面列表</el-button>
         <el-button @click="handlePostAll()" type="primary" size="small">发送整个列表</el-button>
+        <el-button @click="logDlg.visible = true" size="small">发送日志</el-button>
     </el-form>
     <el-dialog :title="siteDlg.title" :visible.sync="siteDlg.visible" top="30px" width="500px">
         <el-form ref="siteForm" :model="siteDlg.siteForm" label-width="80px" size="small">
@@ -79,6 +80,16 @@
             </template>
         </el-table-column>
     </el-table>
+    <el-dialog :title="logDlg.title" :visible.sync="logDlg.visible" top="30px" width="700px">
+        <div style="height:500px; overflow-y: auto;">
+            <ul>
+                <li v-for="log in logDlg.data">{{log}}</li>
+            </ul>
+        </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="siteDlg.visible = false" size="mini">取 消</el-button>
+        </div>
+    </el-dialog>
 </div>
 <#--<script src="//unpkg.com/vue/dist/vue.js"></script>-->
 <#--<script src="//unpkg.com/element-ui@2.2.0/lib/index.js"></script>-->
@@ -115,7 +126,12 @@
                     { id: '${pl['id']!"#"}', title: '${pl.title?js_string}', url: '${pl.url?js_string}', grab: ${pl.isGrab?js_string}, post: ${pl.isPost?js_string}}<#sep>,</#sep>
                 </#list>
             ],
-            tableLoading: false
+            tableLoading: false,
+            logDlg: {
+                visible: false,
+                title: '处理日志',
+                data: []
+            }
         },
         mounted: function() {
             var $this = this;
@@ -137,6 +153,7 @@
                                     $this.$notify.info({
                                         title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
                                     });
+                                    $this.logDlg.data.unshift(dataBody.msg);
                                 });
                             },
                             function(frame){
@@ -190,13 +207,13 @@
                             myPost('/spider/deleteSite/' + $this.sites[index].id, {},
                                     function (data) {
                                         if (data.flag) {
-                                            $this.$message.success(data.msg);
+                                            $this.$message.success({message:data.msg, showClose:true});
                                             if($this.TopForm.site == $this.sites[index].value){
                                                 $this.TopForm.site = "";
                                             }
                                             $this.sites.splice(index, 1);
                                         } else {
-                                            $this.$message.error(data.msg);
+                                            $this.$message.error({message:data.msg, showClose:true});
                                         }
                                     },
                                     function (req, textStatus) {
@@ -218,7 +235,7 @@
                         myPost('/spider/GetPL', $this.TopForm,
                                 function(data){
                                     if(data.flag){
-                                        $this.$message.success(data.msg, {success:true});
+                                        $this.$message.success({message:data.msg, showClose:true});
                                         //$this.listData = $this.listData.concat(data.items.lpl);
                                         $this.listData = data.items.lpl;
                                         // $this.pUrls = [];
@@ -226,7 +243,7 @@
                                         //     $this.pUrls.push({value: pUrl, label: pUrl});
                                         // }
                                     }else{
-                                        $this.$message.error(data.msg);
+                                        $this.$message.error({message:data.msg, showClose:true});
                                     }
                                 },
                                 function(req, textStatus){
@@ -245,11 +262,11 @@
                 myPost('/spider/GetPC/'+$this.listData[index].id, {},
                         function(data){
                             if(data.flag){
-                                $this.$message.success(data.msg);
+                                $this.$message.success({message:data.msg, showClose:true});
                                 $this.listData[index].grab = true;
                                 //$this.$alert(data.html);
                             }else{
-                                $this.$message.error(data.msg);
+                                $this.$message.error({message:data.msg, showClose:true});
                             }
                         },
                         function(req, textStatus){
@@ -266,10 +283,10 @@
                 myPost('/spider/PostZootopia/'+$this.listData[index].id, {},
                         function(data){
                             if(data.flag){
-                                $this.$message.success(data.msg);
+                                $this.$message.success({message:data.msg, showClose:true});
                                 $this.listData[index].post = true;
                             }else{
-                                $this.$message.error(data.msg);
+                                $this.$message.error({message:data.msg, showClose:true});
                             }
                         },
                         function(req, textStatus){
@@ -283,13 +300,14 @@
             handlePostAll: function() {
                 var $this = this;
                 $this.tableLoading = true;
+                $this.logDlg.visible = true;
                 myPost('/spider/PostZootopia/all/'+$this.TopForm.site, {},
                         function(data){
                             if(data.flag){
-                                $this.$message.success(data.msg);
+                                $this.$message.success({message:data.msg, showClose:true});
                                 $this.listData = data.items.lpl;
                             }else{
-                                $this.$message.error(data.msg);
+                                $this.$message.error({message:data.msg, showClose:true});
                             }
                         },
                         function(req, textStatus){
