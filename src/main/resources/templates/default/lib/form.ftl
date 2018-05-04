@@ -5,7 +5,7 @@
                         <#lt> <#if item_index == 0>autofocus</#if> <#list item.attrs?keys as key> ${key}="${item.attrs[key]}"</#list>>
         <#if item.type == 'select'>
             <el-select v-model="${formData}.${item.name}" filterable placeholder="${item.label}">
-                <el-option  v-for="(label, val) in ${itemOptions}.${item.name}" :key="val" :label="label" :value="val"></el-option>
+                <el-option  v-for="(val, key) in ${itemOptions}.${item.name}" :key="key" :label="val" :value="key"></el-option>
             </el-select>
         <#elseif item.type == 'redio'>
             <el-switch v-model="${formData}.${item.name}" active-color="#13ce66"></el-switch>

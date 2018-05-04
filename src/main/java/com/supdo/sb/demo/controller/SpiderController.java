@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,9 @@ import java.util.Map;
 public class SpiderController extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     private PageListRepository pageListRepository;
@@ -104,20 +109,26 @@ public class SpiderController extends BaseController {
 
     @PostMapping("/PostZootopia/{id}")
     @ResponseBody
-    public Result postZootopia(@PathVariable Long id){
-        BaseService.Result serviceResult = spiderProcessService.PostZootopia(id);
+    public Result postZootopia(Principal principal, @PathVariable Long id){
+        BaseService.Result serviceResult = spiderProcessService.PostZootopia(id, null);
         if(!serviceResult.isFlag() && serviceResult.getCode()==-101){
-            serviceResult = spiderProcessService.PostZootopia(id);
+            serviceResult = spiderProcessService.PostZootopia(id, null);
         }
-        return result.simple(serviceResult.isFlag(), serviceResult.getMsg());
+        result.simple(serviceResult.isFlag(), serviceResult.getMsg());
+        String toUser = principal.getName();
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", result);
+        return result;
     }
 
     @PostMapping("/PostZootopia/all/{siteId}")
     @ResponseBody
-    public Result postZootopiaAll(@PathVariable Long siteId){
+    public Result postZootopiaAll(Principal principal, @PathVariable Long siteId){
+        SiteList site = siteListRepository.findOne(siteId);
         List<PageList> lpl = pageListRepository.findBySite(siteId);
         int successCnt = 0;
+        String toUser = principal.getName();
         for(PageList pl : lpl){
+            Result myResult = new Result(true, "初始化");
             BaseService.Result grabResult = null;
             BaseService.Result postResult = null;
             if(!pl.isPost()){
@@ -125,19 +136,24 @@ public class SpiderController extends BaseController {
                     grabResult = spiderProcessService.processContent(pl.getId());
                 }
                 if(grabResult.isFlag()) {
-                    postResult = spiderProcessService.PostZootopia(pl.getId());
+                    postResult = spiderProcessService.PostZootopia(pl.getId(), site);
                     if(!postResult.isFlag() && postResult.getCode()==-101){
-                        postResult = spiderProcessService.PostZootopia(pl.getId());
+                        postResult = spiderProcessService.PostZootopia(pl.getId(), site);
                     }
                     if(postResult.isFlag()){
                         successCnt += 1;
+                        myResult.simple(true, "发送成功！");
                     }else{
-                        logger.error(String.format("发送失败，URL：%s，报错：%s", pl.getUrl(), postResult.getMsg()));
+                        String msg = String.format("发送失败，URL：%s，报错：%s", pl.getUrl(), postResult.getMsg());
+                        logger.error(msg);
+                        myResult.simple(true, msg);
                     }
                 }else{
-                    logger.error(String.format("抓取失败，URL：%s，报错：%s", pl.getUrl(), grabResult.getMsg()));
+                    String msg = String.format("抓取失败，URL：%s，报错：%s", pl.getUrl(), grabResult.getMsg());
+                    logger.error(msg);
+                    myResult.simple(true, msg);
                 }
-
+                simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", myResult);
             }
         }
         result.simple(successCnt>0, "成功处理数量：" + successCnt);

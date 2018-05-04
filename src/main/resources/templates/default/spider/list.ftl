@@ -85,11 +85,14 @@
 <script type="text/javascript" src="/js/jquery.ajax.js"></script>
 <script type="text/javascript" src="/js/vue.min.js"></script>
 <script type="text/javascript" src="/element/element-ui.min.js"></script>
+<script type="text/javascript" src="/js/sockjs.min.js"></script>
+<script type="text/javascript" src="/js/stomp.min.js"></script>
 <script type="text/javascript" src="/js/common.js"></script>
 <script type="text/javascript">
     var main = new Vue({
         el: '#main',
         data: {
+            stompClient: null,
             TopForm: {site: '', force: false},
             sites: [
                 <#list siteList![] as site>
@@ -114,7 +117,35 @@
             ],
             tableLoading: false
         },
+        mounted: function() {
+            var $this = this;
+            this.$nextTick(function () {
+                $this.initWebSocket();
+            });
+        },
         methods: {
+            initWebSocket: function() {
+                var $this = this;
+                var socket = new SockJS('/endpointSpider');
+                if($this.stompClient == null) {
+                    $this.stompClient = Stomp.over(socket);
+                    $this.stompClient.connect({}, function (frame) {
+                                $this.connected = true;
+                                console.log('Connected: ' + frame);
+                                $this.stompClient.subscribe('/user/oto/notifications', function (data) {
+                                    var dataBody = JSON.parse(data.body);
+                                    $this.$notify.info({
+                                        title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
+                                    });
+                                });
+                            },
+                            function(frame){
+                                $this.$notify.error({
+                                    title: '来自服务器的消息', message: frame, showClose:true
+                                });
+                            });
+                }
+            },
             handleAddSite:function() {
                 var $this = this;
                 this.$refs.siteForm.validate(function(valid) {
@@ -187,7 +218,7 @@
                         myPost('/spider/GetPL', $this.TopForm,
                                 function(data){
                                     if(data.flag){
-                                        $this.$message.success(data.msg);
+                                        $this.$message.success(data.msg, {success:true});
                                         //$this.listData = $this.listData.concat(data.items.lpl);
                                         $this.listData = data.items.lpl;
                                         // $this.pUrls = [];

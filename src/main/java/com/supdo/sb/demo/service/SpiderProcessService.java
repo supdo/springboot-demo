@@ -40,6 +40,7 @@ public class SpiderProcessService extends BaseService{
 
     public SpiderProcessService() {
         this.zootopiaTag.put("java", "53");
+        this.zootopiaTag.put("python", "57");
     }
 
     public Result processSite(Long siteId){
@@ -48,17 +49,17 @@ public class SpiderProcessService extends BaseService{
         try {
             List<String> pages = new ArrayList<>();
             Document doc = Jsoup.connect(siteList.getUrl()).get();
-            if(sr.getPages() != null && sr.getPages().length()>0){
-                Elements pageList = doc.select(sr.getPages());
-                for(Element ele : pageList){
-                    pages.add(ele.attr("href"));
+                    if(sr.getPages() != null && sr.getPages().length()>0){
+                        Elements pageList = doc.select(sr.getPages());
+                        for(Element ele : pageList){
+                            pages.add(ele.attr("href"));
                 }
             }
             if(!pages.contains(siteList.getUrl())){
                 pages.add(siteList.getUrl());
             }
             List<PageList> lpl = this.processList(pages, sr, siteList);
-            result.simple(true, "获取成功");
+            result.simple(true, String.format("获取条数：%s", lpl.size()));
             result.putItem("pageList", lpl);
         } catch (IOException e){
             e.printStackTrace();
@@ -168,7 +169,7 @@ public class SpiderProcessService extends BaseService{
         return zootopiaCookie;
     }
 
-    public Result PostZootopia(Long id){
+    public Result PostZootopia(Long id, SiteList site){
         try {
             myRedisManager.init();
             Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
@@ -191,8 +192,24 @@ public class SpiderProcessService extends BaseService{
             shareData.put("body_parser", "html");
             shareData.put("source", "1");
             shareData.put("draft", "0");
-            shareData.put("tags", "53");
+            //shareData.put("tags", "53");
             shareData.put("sections", "");
+            String tags = pc.getTags().trim();
+            if(tags.length()<1){
+                if (site == null) {
+                    site = siteListRepository.findOne(pc.getSite());
+                }
+                shareData.put("tags", site.getTag());
+            }else{
+                String tagsKey = zootopiaTag.get(tags.toLowerCase());
+                if(tagsKey == null){
+                    result.simple(false, "未找到Tag的值");
+                    return result;
+                }else{
+                    shareData.put("tags", tagsKey);
+                }
+
+            }
 
             String shareUrl = "http://www.zootopia.unicom.local/sharing/api/add_share.json";
             Connection conn = Jsoup.connect(shareUrl);
