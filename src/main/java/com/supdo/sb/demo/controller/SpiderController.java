@@ -161,4 +161,10 @@ public class SpiderController extends BaseController {
         result.putItems("lpl", lpl);
         return result;
     }
+
+    @GetMapping("zootopia")
+    public String zootopiaView(Map<String, Object> map){
+        return render("/spider/zootopia");
+    }
+
 }

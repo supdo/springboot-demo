@@ -189,7 +189,8 @@
                 spider: {
                     title: '爬虫', icon: '', children: {
                         list: {title: '页面列表', icon: '', url: '/spider/list'},
-                        rule: {title: '规则管理', icon: '', url: '/spiderRule/list'}
+                        rule: {title: '规则管理', icon: '', url: '/spiderRule/list'},
+                        zootopia: {title: 'zootopia', icon: '', url: '/spider/zootopia'}
                     }
                 },
                 websocket: {
