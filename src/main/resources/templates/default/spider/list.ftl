@@ -23,8 +23,28 @@
         .btn-delete-site:hover {
             color: #990000;
         }
+        .el-dialog__header {
+            padding: 10px 20px;
+        }
+        .el-dialog__headerbtn {
+            top: 10px;
+        }
         .el-dialog__body {
             padding: 10px 15px 0 15px;
+        }
+        .log-body {
+            height:500px;
+            overflow-y: auto;
+        }
+        .log-body ul {
+            padding: 2px;
+            margin: 0px;
+        }
+        .log-body ul li {
+            list-style: none;
+        }
+        .el-dialog__footer {
+            padding: 10px 20px;
         }
     </style>
 </head>
@@ -81,7 +101,7 @@
         </el-table-column>
     </el-table>
     <el-dialog :title="logDlg.title" :visible.sync="logDlg.visible" top="30px" width="700px">
-        <div style="height:500px; overflow-y: auto;">
+        <div class="log-body">
             <ul>
                 <li v-for="log in logDlg.data">{{log}}</li>
             </ul>
@@ -153,13 +173,17 @@
                                     $this.$notify.info({
                                         title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
                                     });
-                                    $this.logDlg.data.unshift(dataBody.msg);
+                                    //$this.logDlg.data.unshift(dataBody.msg);
+                                    var newDate = new Date();
+                                    $this.logDlg.data.unshift(newDate.format('yyyy-MM-dd h:m:s')+" -- "+dataBody.msg);
                                 });
                             },
                             function(frame){
                                 $this.$notify.error({
                                     title: '来自服务器的消息', message: frame, showClose:true
                                 });
+                                var newDate = new Date();
+                                $this.logDlg.data.unshift(newDate.format('yyyy-MM-dd h:m:s')+" -- "+dataBody.msg);
                             });
                 }
             },

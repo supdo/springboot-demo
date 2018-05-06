@@ -1,5 +1,6 @@
 package com.supdo.sb.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.supdo.sb.demo.dao.PageListRepository;
 import com.supdo.sb.demo.dao.SiteListRepository;
 import com.supdo.sb.demo.dao.SpiderRuleRepository;
@@ -162,9 +163,34 @@ public class SpiderController extends BaseController {
         return result;
     }
 
-    @GetMapping("zootopia")
+    @GetMapping("/zootopia")
     public String zootopiaView(Map<String, Object> map){
         return render("/spider/zootopia");
+    }
+
+    @PostMapping("/getMyShare")
+    @ResponseBody
+    public Result getMyShare(Principal principal, @RequestParam("page") int page){
+        String toUser = principal.getName();
+        int newPage = page;
+        BaseService.Result sResult = getMyShareByPage(newPage, toUser);
+        JSONObject shareJson = (JSONObject) sResult.getItem("shareJson");
+        while((boolean)shareJson.get("has_more")){
+            newPage += 1;
+            sResult = getMyShareByPage(newPage, toUser);
+            shareJson = (JSONObject) sResult.getItem("shareJson");
+        }
+        return result;
+    }
+
+    private BaseService.Result getMyShareByPage(int page, String toUser){
+        BaseService.Result sResult = spiderProcessService.getMyShare(page);
+        if(!sResult.isFlag() && sResult.getCode()==-101){
+            sResult = spiderProcessService.getMyShare(page);
+        }
+        result.simple(sResult.isFlag(), sResult.getMsg());
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", result);
+        return sResult;
     }
 
 }

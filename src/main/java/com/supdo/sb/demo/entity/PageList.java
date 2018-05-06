@@ -44,6 +44,9 @@ public class PageList extends BaseEntity implements Serializable {
     @Column(nullable=false)
     private String postId = "";
 
+    @Column(nullable=false)
+    private boolean postDo = false;
+
     public Long getId() {
         return id;
     }
@@ -124,7 +127,6 @@ public class PageList extends BaseEntity implements Serializable {
         isPost = post;
     }
 
-
     public String getPostId() {
         return postId;
     }
@@ -132,4 +134,13 @@ public class PageList extends BaseEntity implements Serializable {
     public void setPostId(String postId) {
         this.postId = postId;
     }
+
+    public boolean isPostDo() {
+        return postDo;
+    }
+
+    public void setPostDo(boolean postDo) {
+        this.postDo = postDo;
+    }
+
 }

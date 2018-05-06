@@ -49,10 +49,10 @@ public class SpiderProcessService extends BaseService{
         try {
             List<String> pages = new ArrayList<>();
             Document doc = Jsoup.connect(siteList.getUrl()).get();
-                    if(sr.getPages() != null && sr.getPages().length()>0){
-                        Elements pageList = doc.select(sr.getPages());
-                        for(Element ele : pageList){
-                            pages.add(ele.attr("href"));
+            if(sr.getPages() != null && sr.getPages().length()>0){
+                Elements pageList = doc.select(sr.getPages());
+                for(Element ele : pageList){
+                    pages.add(ele.attr("href"));
                 }
             }
             if(!pages.contains(siteList.getUrl())){
@@ -233,23 +233,67 @@ public class SpiderProcessService extends BaseService{
                 } else {
                     result.simple(false, (String)shareJson.get("msg"));
                 }
-            }else if(shareRes.contentType().indexOf("text/html;")>-1){
-                //Jsoup.parse(shareBody)
-                //未登陆
-                if(shareBody.indexOf("/u/login/?path=")>-1){
-                    zootopiaCookie = LoginZootopia();
-                    myRedisManager.set("zootopiaCookie", zootopiaCookie);
-                    result.simple(false, "会话失效，已重新登陆");
-                    result.setCode(-101);
-                }else{
-                    result.simple(false, "返回html，尚未处理的情况");
-                }
-            }else{
-                result.simple(false, "尚未处理的情况");
+            }else {
+                result = isLoginZootopia(shareRes);
             }
         } catch (IOException e) {
             e.printStackTrace();
             result.simple(false, e.getMessage());
+        }
+        return result;
+    }
+
+    public Result getMyShare(int page){
+        try {
+            myRedisManager.init();
+            Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
+            if(zootopiaCookie == null){
+                zootopiaCookie = LoginZootopia();
+                myRedisManager.set("zootopiaCookie", zootopiaCookie);
+            }
+            String getMyShareUrl = "http://www.zootopia.unicom.local/sharing/api/get_user_share.json";
+            Connection conn = Jsoup.connect(getMyShareUrl);
+            //user_id=quke2&page_size=10&page=1
+            conn.data("user_id", "quke2", "page_size", "10", "page", String.valueOf(page));
+            conn.cookies(zootopiaCookie);
+            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            conn.header("Content-Type", "application/x-www-form-urlencoded");
+            conn.header("Host", "www.portal.unicom.local");
+            conn.header("Origin", "http://www.zootopia.unicom.local");
+            conn.header("Referer", "http://http://www.zootopia.unicom.local/");
+            conn.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
+            Response shareRes = conn.method(Connection.Method.POST).execute();
+            String shareBody = shareRes.body();
+            if(shareRes.contentType().indexOf("text/javascript;")>-1) {
+                JSONObject shareJson = JSON.parseObject(shareBody);
+                result.putItem("shareJson", shareJson);
+                result.simple(true, "获取分享成功。");
+            }else {
+                result = isLoginZootopia(shareRes);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.simple(false, e.getMessage());
+        }
+        return  result;
+    }
+
+    private Result isLoginZootopia(Response shareRes) throws IOException {
+        String shareBody = shareRes.body();
+        Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
+        if(shareRes.contentType().indexOf("text/html;")>-1){
+            //Jsoup.parse(shareBody)
+            //未登陆
+            if(shareBody.indexOf("/u/login/?path=")>-1){
+                zootopiaCookie = LoginZootopia();
+                myRedisManager.set("zootopiaCookie", zootopiaCookie);
+                result.simple(false, "会话失效，已重新登陆");
+                result.setCode(-101);
+            }else{
+                result.simple(false, "返回html，尚未处理的情况");
+            }
+        }else{
+            result.simple(false, "尚未处理的情况");
         }
         return result;
     }

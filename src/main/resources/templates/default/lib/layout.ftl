@@ -1,4 +1,4 @@
-<#macro default title="default layout" css="" style="" main="", js="">
+<#macro default title="default layout" css="" style="">
 <!DOCTYPE html>
 <html lang="en">
 <head>
