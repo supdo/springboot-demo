@@ -1,5 +1,6 @@
 package com.supdo.sb.demo.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.supdo.sb.demo.dao.PageListRepository;
 import com.supdo.sb.demo.dao.SiteListRepository;
@@ -12,13 +13,17 @@ import com.supdo.sb.demo.service.SpiderProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +33,7 @@ import java.util.Map;
 public class SpiderController extends BaseController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
@@ -175,21 +181,39 @@ public class SpiderController extends BaseController {
         int newPage = page;
         BaseService.Result sResult = getMyShareByPage(newPage, toUser);
         JSONObject shareJson = (JSONObject) sResult.getItem("shareJson");
+        logger.info("{} -- {}, page:{}", format.format((new Date()).getTime()), sResult.getMsg(), newPage);
         while((boolean)shareJson.get("has_more")){
             newPage += 1;
             sResult = getMyShareByPage(newPage, toUser);
             shareJson = (JSONObject) sResult.getItem("shareJson");
+            logger.info("{} -- {}, page:{}", format.format((new Date()).getTime()), sResult.getMsg(), newPage);
         }
         return result;
     }
 
-    private BaseService.Result getMyShareByPage(int page, String toUser){
+    @Transactional
+    BaseService.Result getMyShareByPage(int page, String toUser){
         BaseService.Result sResult = spiderProcessService.getMyShare(page);
         if(!sResult.isFlag() && sResult.getCode()==-101){
             sResult = spiderProcessService.getMyShare(page);
         }
-        result.simple(sResult.isFlag(), sResult.getMsg());
+        result.simple(sResult.isFlag(), sResult.getMsg()+"; page:"+String.valueOf(page));
         simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", result);
+        JSONObject shareJson = (JSONObject) sResult.getItem("shareJson");
+        JSONArray shares = shareJson.getJSONArray("shares");
+        for(int i=0; i<shares.size(); i++){
+            JSONObject share = shares.getJSONObject(i);
+            int share_id = share.getInteger("sh_id");
+            String title = share.getString("title");
+            List<PageList> lpl = pageListRepository.findByTitle(title);
+            if(lpl.size() > 0 && lpl.get(0).getPostId().length()==0){
+                PageList pl = lpl.get(0);
+                pl.setPostId(String.valueOf(share_id));
+                pageListRepository.save(pl);
+                Result myResult = new Result(true, String.format("share_id: %s, title: %s", pl.getPostId(), pl.getTitle()));
+                simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", myResult);
+            }
+        }
         return sResult;
     }
 

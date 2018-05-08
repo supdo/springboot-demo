@@ -41,6 +41,8 @@ public class BaseController {
 
         public Result(boolean flag, String msg) {
             super();
+            this.flag = flag;
+            this.msg = msg;
 
         }
 

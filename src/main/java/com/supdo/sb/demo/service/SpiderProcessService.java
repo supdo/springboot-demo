@@ -17,8 +17,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,9 @@ import java.util.Map;
 
 @Service
 public class SpiderProcessService extends BaseService{
+
+    private String myLogin = "quke2";
+    private String myPwd = "quke@1256";
 
     @Autowired
     private MyRedisManager myRedisManager;
@@ -47,15 +52,24 @@ public class SpiderProcessService extends BaseService{
         SiteList siteList = siteListRepository.findOne(siteId);
         SpiderRule sr = spiderRuleRepository.findOne(siteList.getRule());
         try {
-            List<String> pages = new ArrayList<>();
+            URL myUrl = new URL(siteList.getUrl());
+
+            List<String> pages = new ArrayList<String>();
             Document doc = Jsoup.connect(siteList.getUrl()).get();
             if(sr.getPages() != null && sr.getPages().length()>0){
                 Elements pageList = doc.select(sr.getPages());
+                int cnt = 0;
                 for(Element ele : pageList){
-                    pages.add(ele.attr("href"));
+                    cnt += 1;
+                    String href = ele.attr("href");
+                    if(!href.startsWith(myUrl.getProtocol()+"//"+myUrl.getHost())){
+                        href = myUrl.getProtocol()+"://"+myUrl.getHost()+href;
+                    }
+                    pages.add(href);
+                    if(cnt >=10) break;
                 }
             }
-            if(!pages.contains(siteList.getUrl())){
+            if(!pages.contains(siteList.getUrl().toString())) {
                 pages.add(siteList.getUrl());
             }
             List<PageList> lpl = this.processList(pages, sr, siteList);
@@ -68,6 +82,7 @@ public class SpiderProcessService extends BaseService{
         return result;
     }
 
+    @Transactional
     public List<PageList> processList(List<String> pages, SpiderRule sr, SiteList siteList) throws IOException {
         List<PageList> lpl = new ArrayList<PageList>();
         for(String pageUrl : pages) {
@@ -78,11 +93,13 @@ public class SpiderProcessService extends BaseService{
                 PageList pl = new PageList();
                 String url = ele.select(sr.getUrl()).first().attr("href");
                 String title = ele.select(sr.getTitle()).first().text();
-                pl.setUrl(url);
-                pl.setTitle(title);
-                pl.setSite(siteList.getId());
-                if (pageListRepository.findByUrl(url).size() == 0) {
-                    pl = pageListRepository.save(pl);
+                if(pageListRepository.findByUrl(url).size() == 0) {
+                    pl.setUrl(url);
+                    pl.setTitle(title);
+                    pl.setSite(siteList.getId());
+                    if (pageListRepository.findByUrl(url).size() == 0) {
+                        pl = pageListRepository.save(pl);
+                    }
                 }
                 lpl.add(pl);
             }
@@ -90,6 +107,7 @@ public class SpiderProcessService extends BaseService{
         return lpl;
     }
 
+    @Transactional
     public Result processContent(Long pageId){
         PageList pc = pageListRepository.findOne(pageId);
         SiteList siteList = siteListRepository.findOne(pc.getSite());
@@ -116,13 +134,13 @@ public class SpiderProcessService extends BaseService{
         return result;
     }
 
-    public Map<String, String> LoginZootopia() throws IOException {
+    public Map<String, String> LoginZootopia(String login, String password) throws IOException {
         //String loginPageUrl = "http://www.zootopia.unicom.local/u/login/?path=http://www.zootopia.unicom.local/";
 
 
         String zootopiaLoginUrl = "http://sso.portal.unicom.local/eip_sso/rest/authentication/login";
         Connection conn = Jsoup.connect(zootopiaLoginUrl);
-        conn.data("login", "quke2", "password", "quke@1256", "appid", "na116",
+        conn.data("login", login, "password", password, "appid", "na116",
                 "success", "http://www.zootopia.unicom.local/u/login/sso/on_success/",
                 "error", "http://www.zootopia.unicom.local/u/login/sso/on_error/",
                 "return", "http://www.zootopia.unicom.local/u/login/");
@@ -169,12 +187,13 @@ public class SpiderProcessService extends BaseService{
         return zootopiaCookie;
     }
 
+    @Transactional
     public Result PostZootopia(Long id, SiteList site){
         try {
             myRedisManager.init();
             Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
             if(zootopiaCookie == null){
-                zootopiaCookie = LoginZootopia();
+                zootopiaCookie = LoginZootopia(myLogin, myPwd);
                 myRedisManager.set("zootopiaCookie", zootopiaCookie);
             }
             PageList pc =  pageListRepository.findOne(id);
@@ -248,13 +267,13 @@ public class SpiderProcessService extends BaseService{
             myRedisManager.init();
             Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
             if(zootopiaCookie == null){
-                zootopiaCookie = LoginZootopia();
+                zootopiaCookie = LoginZootopia(myLogin, myPwd);
                 myRedisManager.set("zootopiaCookie", zootopiaCookie);
             }
             String getMyShareUrl = "http://www.zootopia.unicom.local/sharing/api/get_user_share.json";
             Connection conn = Jsoup.connect(getMyShareUrl);
             //user_id=quke2&page_size=10&page=1
-            conn.data("user_id", "quke2", "page_size", "10", "page", String.valueOf(page));
+            conn.data("user_id", "quke2", "page_size", "50", "page", String.valueOf(page));
             conn.cookies(zootopiaCookie);
             conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
             conn.header("Content-Type", "application/x-www-form-urlencoded");
@@ -285,7 +304,7 @@ public class SpiderProcessService extends BaseService{
             //Jsoup.parse(shareBody)
             //未登陆
             if(shareBody.indexOf("/u/login/?path=")>-1){
-                zootopiaCookie = LoginZootopia();
+                zootopiaCookie = LoginZootopia(myLogin, myPwd);
                 myRedisManager.set("zootopiaCookie", zootopiaCookie);
                 result.simple(false, "会话失效，已重新登陆");
                 result.setCode(-101);

@@ -183,7 +183,7 @@
                                     title: '来自服务器的消息', message: frame, showClose:true
                                 });
                                 var newDate = new Date();
-                                $this.logDlg.data.unshift(newDate.format('yyyy-MM-dd h:m:s')+" -- "+dataBody.msg);
+                                $this.logDlg.data.unshift(newDate.format('yyyy-MM-dd h:m:s')+" -- 失去连接，"+frame);
                             });
                 }
             },

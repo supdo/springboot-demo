@@ -61,6 +61,16 @@ Zootopia
             <el-button @click="logDlg.visible = false" size="mini">取 消</el-button>
         </div>
     </el-dialog>
+
+    <el-form ref="loginForm" :inline="true" :model="loginForm" size="small">
+        <el-form-item label="用户名" prop="username" :rules="{ required: true, message: '用户名不能为空'}">
+            <el-input v-model="loginForm.username" placeholder="用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password" :rules="{ required: true, message: '密码不能为空'}">
+            <el-input v-model="loginForm.password" placeholder="密码"></el-input>
+        </el-form-item>
+        <el-button @click="zanShare()" type="primary" size="small">分享点赞</el-button>
+    </el-form>
 </div>
 <@layout.defaultjs />
 <script type="text/javascript" src="/js/sockjs.min.js"></script>
@@ -74,7 +84,8 @@ Zootopia
                 visible: false,
                 title: '处理日志',
                 data: []
-            }
+            },
+            loginForm: {username: '', password: ''}
         },
         mounted: function () {
             var $this = this;
@@ -127,6 +138,9 @@ Zootopia
                             $this.tableLoading = false;
                         }
                 );
+            },
+            zanShare: function(){
+
             }
         }
     });

@@ -12,4 +12,6 @@ public interface PageListRepository extends JpaRepository<PageList, Long> {
 
     List<PageList> findBySite(Long site);
 
+    List<PageList> findByTitle(String title);
+
 }
