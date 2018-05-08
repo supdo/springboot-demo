@@ -67,9 +67,9 @@ Zootopia
             <el-input v-model="loginForm.username" placeholder="用户名"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password" :rules="{ required: true, message: '密码不能为空'}">
-            <el-input v-model="loginForm.password" placeholder="密码"></el-input>
+            <el-input type="password" v-model="loginForm.password" placeholder="密码"></el-input>
         </el-form-item>
-        <el-button @click="zanShare()" type="primary" size="small">分享点赞</el-button>
+        <el-button @click="voteShare()" type="primary" size="small">分享点赞</el-button>
     </el-form>
 </div>
 <@layout.defaultjs />
@@ -139,8 +139,25 @@ Zootopia
                         }
                 );
             },
-            zanShare: function(){
-
+            voteShare: function(){
+                var $this = this;
+                $this.tableLoading = true;
+                $this.logDlg.visible = true;
+                myPost('/spider/voteMyShare/', $this.loginForm,
+                        function(data){
+                            if(data.flag){
+                                $this.$message.success({message:data.msg, showClose:true});
+                            }else{
+                                $this.$message.error({message:data.msg, showClose:true});
+                            }
+                        },
+                        function(req, textStatus){
+                            $this.$message.error(textStatus);
+                        },
+                        function(req, textStatus){
+                            $this.tableLoading = false;
+                        }
+                );
             }
         }
     });

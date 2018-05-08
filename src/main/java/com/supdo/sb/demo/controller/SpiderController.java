@@ -63,7 +63,7 @@ public class SpiderController extends BaseController {
         site.getFields().get("rule").setOptions(ruleOptions);
         map.put("siteForm", site);
 
-        List<SiteList> siteList = siteListRepository.findAll();
+        List<SiteList> siteList = siteListRepository.findByValid(true);
         map.put("siteList", siteList);
         return render("/spider/list");
     }
@@ -215,6 +215,29 @@ public class SpiderController extends BaseController {
             }
         }
         return sResult;
+    }
+
+    @PostMapping("/voteMyShare")
+    @ResponseBody
+    public Result voteMyShare(Principal principal, @RequestParam("username") String username, @RequestParam("password") String password){
+        String toUser = principal.getName();
+        List<PageList> lpl = pageListRepository.findByIsPost(true);
+        for(PageList pl : lpl){
+            BaseService.Result sResult = spiderProcessService.voteShare(pl.getPostId(), username, password);
+            if(!sResult.isFlag() && sResult.getCode()==-101){
+                sResult = spiderProcessService.voteShare(pl.getPostId(), username, password);
+            }
+            Result myResult;
+            if(sResult.isFlag()) {
+                myResult = new Result(sResult.isFlag(), String.format("投票成功！share_id: %s, title: %s", pl.getPostId(), pl.getTitle()));
+            }else{
+                myResult = new Result(sResult.isFlag(), sResult.getMsg());
+                logger.error(sResult.getMsg());
+            }
+
+            simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", myResult);
+        }
+        return result;
     }
 
 }

@@ -36,6 +36,9 @@ public class SiteList extends BaseEntity implements Serializable {
     @Column(nullable=true, length=200)
     private String tag;
 
+    @Column(nullable=false)
+    private boolean valid = true;
+
     public Long getId() {
         return id;
     }
@@ -84,5 +87,16 @@ public class SiteList extends BaseEntity implements Serializable {
         this.tag = tag;
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+
+
     public interface ISiteList {}
+
 }

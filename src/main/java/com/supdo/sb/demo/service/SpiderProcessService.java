@@ -190,12 +190,7 @@ public class SpiderProcessService extends BaseService{
     @Transactional
     public Result PostZootopia(Long id, SiteList site){
         try {
-            myRedisManager.init();
-            Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
-            if(zootopiaCookie == null){
-                zootopiaCookie = LoginZootopia(myLogin, myPwd);
-                myRedisManager.set("zootopiaCookie", zootopiaCookie);
-            }
+            Map<String, String> zootopiaCookie = isMyCacheZootopiaCookie();
             PageList pc =  pageListRepository.findOne(id);
             if(!pc.isGrab()){
                 result.simple(false, "尚未抓取内容");
@@ -253,7 +248,7 @@ public class SpiderProcessService extends BaseService{
                     result.simple(false, (String)shareJson.get("msg"));
                 }
             }else {
-                result = isLoginZootopia(shareRes);
+                result = isMyLoginZootopia(shareRes);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -264,12 +259,7 @@ public class SpiderProcessService extends BaseService{
 
     public Result getMyShare(int page){
         try {
-            myRedisManager.init();
-            Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
-            if(zootopiaCookie == null){
-                zootopiaCookie = LoginZootopia(myLogin, myPwd);
-                myRedisManager.set("zootopiaCookie", zootopiaCookie);
-            }
+            Map<String, String> zootopiaCookie = isMyCacheZootopiaCookie();
             String getMyShareUrl = "http://www.zootopia.unicom.local/sharing/api/get_user_share.json";
             Connection conn = Jsoup.connect(getMyShareUrl);
             //user_id=quke2&page_size=10&page=1
@@ -288,7 +278,7 @@ public class SpiderProcessService extends BaseService{
                 result.putItem("shareJson", shareJson);
                 result.simple(true, "获取分享成功。");
             }else {
-                result = isLoginZootopia(shareRes);
+                result = isMyLoginZootopia(shareRes);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -297,15 +287,35 @@ public class SpiderProcessService extends BaseService{
         return  result;
     }
 
-    private Result isLoginZootopia(Response shareRes) throws IOException {
+    private Map<String, String> isMyCacheZootopiaCookie() throws IOException {
+        return isCacheZootopiaCookie(myLogin, myPwd);
+    }
+
+    private Map<String, String> isCacheZootopiaCookie(String login, String password) throws IOException {
+        myRedisManager.init();
+        String cache_key = "zootopiaCookie_"+login;
+        Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get(cache_key);
+        if(zootopiaCookie == null){
+            zootopiaCookie = LoginZootopia(login, password);
+            myRedisManager.set(cache_key, zootopiaCookie);
+        }
+        return zootopiaCookie;
+    }
+
+    private Result isMyLoginZootopia(Response shareRes) throws IOException {
+        return isLoginZootopia(shareRes, myLogin ,myPwd);
+    }
+
+    private Result isLoginZootopia(Response shareRes, String login, String password) throws IOException {
+        String cache_key = "zootopiaCookie_"+login;
         String shareBody = shareRes.body();
-        Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get("zootopiaCookie");
+        Map<String, String> zootopiaCookie = (Map<String, String>)myRedisManager.get(cache_key);
         if(shareRes.contentType().indexOf("text/html;")>-1){
             //Jsoup.parse(shareBody)
             //未登陆
             if(shareBody.indexOf("/u/login/?path=")>-1){
-                zootopiaCookie = LoginZootopia(myLogin, myPwd);
-                myRedisManager.set("zootopiaCookie", zootopiaCookie);
+                zootopiaCookie = LoginZootopia(login, password);
+                myRedisManager.set(cache_key, zootopiaCookie);
                 result.simple(false, "会话失效，已重新登陆");
                 result.setCode(-101);
             }else{
@@ -313,6 +323,35 @@ public class SpiderProcessService extends BaseService{
             }
         }else{
             result.simple(false, "尚未处理的情况");
+        }
+        return result;
+    }
+
+    public Result voteShare(String share_id, String login, String password){
+        try {
+            Map<String, String> zootopiaCookie = isCacheZootopiaCookie(login, password);
+            String voteMyShareUrl = "http://www.zootopia.unicom.local/sharing/api/vote.json";
+            Connection conn = Jsoup.connect(voteMyShareUrl);
+            conn.data("sh_id", share_id, "vote", "up");
+            conn.cookies(zootopiaCookie);
+            conn.header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            conn.header("Content-Type", "application/x-www-form-urlencoded");
+            conn.header("Host", "www.portal.unicom.local");
+            conn.header("Origin", "http://www.zootopia.unicom.local");
+            conn.header("Referer", "http://http://www.zootopia.unicom.local/");
+            conn.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.167 Safari/537.36");
+            Response shareRes = conn.method(Connection.Method.POST).execute();
+            String shareBody = shareRes.body();
+            if(shareRes.contentType().indexOf("text/javascript;")>-1) {
+                JSONObject shareJson = JSON.parseObject(shareBody);
+                result.putItem("shareJson", shareJson);
+                result.simple(true, "投票成功。");
+            }else {
+                result = isLoginZootopia(shareRes, login, password);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.simple(false, e.getMessage());
         }
         return result;
     }

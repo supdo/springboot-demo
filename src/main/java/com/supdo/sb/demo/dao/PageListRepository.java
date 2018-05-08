@@ -14,4 +14,6 @@ public interface PageListRepository extends JpaRepository<PageList, Long> {
 
     List<PageList> findByTitle(String title);
 
+    List<PageList> findByIsPost(boolean isPost);
+
 }
