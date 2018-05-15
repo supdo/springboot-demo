@@ -3,6 +3,7 @@ package com.supdo.sb.demo.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.supdo.sb.demo.entity.SysUser;
+import com.supdo.sb.demo.plugin.Result;
 import com.supdo.sb.demo.plugin.websocket.SocketSessionRegistry;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -58,7 +59,7 @@ public class WebSocketController extends BaseController{
 //        Subject subject = SecurityUtils.getSubject();
 //        Object o = subject.getPrincipal();
 //        map.put("currentUserName",username);
-        return render("/websocket/hello");
+        return render("websocket/hello");
     }
 
     @MessageMapping("/hello")

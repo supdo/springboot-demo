@@ -1,6 +1,7 @@
 package com.supdo.sb.demo.controller.admin;
 
 import com.supdo.sb.demo.entity.SysPermission;
+import com.supdo.sb.demo.plugin.Result;
 import com.supdo.sb.demo.service.SysPermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -42,7 +42,6 @@
     </style>
 </#assign>
 <@layout.default title="Zootopia" style=style>
-Zootopia
 <div id="main" v-cloak>
     <el-form ref="TopForm" :inline="true" :model="TopForm" size="small">
         <el-form-item label="页数" prop="page" :rules="{ required: true, message: '页数不能为空'}">

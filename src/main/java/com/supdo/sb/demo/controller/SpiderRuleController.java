@@ -2,6 +2,7 @@ package com.supdo.sb.demo.controller;
 
 import com.supdo.sb.demo.dao.SpiderRuleRepository;
 import com.supdo.sb.demo.entity.SpiderRule;
+import com.supdo.sb.demo.plugin.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -26,7 +27,7 @@ public class SpiderRuleController extends BaseController{
 
         List<SpiderRule> ruleList = spiderRuleRepository.findAll();
         map.put("items", ruleList);
-        return render("/spider/rule");
+        return render("spider/rule");
     }
 
     @PostMapping("/save")

@@ -3,6 +3,7 @@ package com.supdo.sb.demo.controller.admin;
 import com.supdo.sb.demo.common.StringUtility;
 import com.supdo.sb.demo.entity.SysRole;
 import com.supdo.sb.demo.entity.SysUser;
+import com.supdo.sb.demo.plugin.Result;
 import com.supdo.sb.demo.service.SysRoleService;
 import com.supdo.sb.demo.service.SysUserService;
 import org.apache.shiro.crypto.hash.SimpleHash;

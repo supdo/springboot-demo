@@ -8,6 +8,7 @@ import com.supdo.sb.demo.dao.SpiderRuleRepository;
 import com.supdo.sb.demo.entity.PageList;
 import com.supdo.sb.demo.entity.SiteList;
 import com.supdo.sb.demo.entity.SpiderRule;
+import com.supdo.sb.demo.plugin.Result;
 import com.supdo.sb.demo.service.BaseService;
 import com.supdo.sb.demo.service.SpiderProcessService;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class SpiderController extends BaseController {
 
         List<SiteList> siteList = siteListRepository.findByValid(true);
         map.put("siteList", siteList);
-        return render("/spider/list");
+        return render("spider/list");
     }
 
     @PostMapping("/addSite")
@@ -139,26 +140,30 @@ public class SpiderController extends BaseController {
             BaseService.Result grabResult = null;
             BaseService.Result postResult = null;
             if(!pl.isPost()){
-                if(!pl.isGrab()){
-                    grabResult = spiderProcessService.processContent(pl.getId());
-                }
-                if(grabResult.isFlag()) {
-                    postResult = spiderProcessService.PostZootopia(pl.getId(), site);
-                    if(!postResult.isFlag() && postResult.getCode()==-101){
-                        postResult = spiderProcessService.PostZootopia(pl.getId(), site);
+                try {
+                    if (!pl.isGrab()) {
+                        grabResult = spiderProcessService.processContent(pl.getId());
                     }
-                    if(postResult.isFlag()){
-                        successCnt += 1;
-                        myResult.simple(true, String.format("发送成功！标题：%s；URL：%s", pl.getTitle(), pl.getUrl()));
-                    }else{
-                        String msg = String.format("发送失败，URL：%s，报错：%s", pl.getUrl(), postResult.getMsg());
+                    if (grabResult.isFlag()) {
+                        postResult = spiderProcessService.PostZootopia(pl.getId(), site);
+                        if (!postResult.isFlag() && postResult.getCode() == -101) {
+                            postResult = spiderProcessService.PostZootopia(pl.getId(), site);
+                        }
+                        if (postResult.isFlag()) {
+                            successCnt += 1;
+                            myResult.simple(true, String.format("发送成功！标题：%s；URL：%s", pl.getTitle(), pl.getUrl()));
+                        } else {
+                            String msg = String.format("发送失败，URL：%s，报错：%s", pl.getUrl(), postResult.getMsg());
+                            logger.error(msg);
+                            myResult.simple(true, msg);
+                        }
+                    } else {
+                        String msg = String.format("抓取失败，URL：%s，报错：%s", pl.getUrl(), grabResult.getMsg());
                         logger.error(msg);
                         myResult.simple(true, msg);
                     }
-                }else{
-                    String msg = String.format("抓取失败，URL：%s，报错：%s", pl.getUrl(), grabResult.getMsg());
-                    logger.error(msg);
-                    myResult.simple(true, msg);
+                }catch(Exception e){
+                    myResult.simple(false, e.getMessage());
                 }
                 simpMessagingTemplate.convertAndSendToUser(toUser, "/oto/notifications", myResult);
             }
@@ -171,7 +176,7 @@ public class SpiderController extends BaseController {
 
     @GetMapping("/zootopia")
     public String zootopiaView(Map<String, Object> map){
-        return render("/spider/zootopia");
+        return render("spider/zootopia");
     }
 
     @PostMapping("/getMyShare")

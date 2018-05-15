@@ -3,6 +3,7 @@ package com.supdo.sb.demo.controller.admin;
 import com.supdo.sb.demo.common.StringUtility;
 import com.supdo.sb.demo.entity.SysPermission;
 import com.supdo.sb.demo.entity.SysRole;
+import com.supdo.sb.demo.plugin.Result;
 import com.supdo.sb.demo.service.SysPermissionService;
 import com.supdo.sb.demo.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;

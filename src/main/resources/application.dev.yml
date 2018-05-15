@@ -2,8 +2,6 @@ server:
   port: 8080
   compression:
     enabled: true
-  error:
-      path: /error
 
 spring:
   profiles:

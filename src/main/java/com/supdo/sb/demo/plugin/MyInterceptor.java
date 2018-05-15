@@ -38,9 +38,10 @@ public class MyInterceptor implements HandlerInterceptor {
         HandlerMethod method=(HandlerMethod) handler;
         Object controller = method.getBean();
         Class<?> superClass =  controller.getClass().getSuperclass();
+        logger.info("1: "+superClass.toString());
         if(!superClass.equals(BaseController.class)){
             superClass = superClass.getSuperclass();
-            if(!superClass.equals(BaseController.class)){
+            if(superClass != null && !superClass.equals(BaseController.class)){
                 superClass = superClass.getSuperclass();
             }
         }
