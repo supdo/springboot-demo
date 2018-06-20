@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Login</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css" />
     <style type="text/css">
         #loginApp {
             width: 400px;
@@ -17,7 +17,7 @@
 <body>
 <div id="loginApp" v-cloak>
     <el-card class="loginCard">
-        <div slot="header" ><span class="card-title-text">欢迎登陆</span> <span style="float:right;"><a href="/logon">注册</a></span></div>
+        <div slot="header" ><span class="card-title-text">欢迎登陆</span> <span style="float:right;"><a href="${request.contextPath}/logon">注册</a></span></div>
         <el-form ref="loginForm"  :model="formData" label-width="80px">
             <el-form-item ref="username" prop="username" label="用户名" :error="formError.username" :rules="{required: true, message: '用户名不能为空', trigger: 'blur'}">
                 <el-input type="text" v-model="formData.username" placeholder="用户名"></el-input>
@@ -39,11 +39,12 @@
         </el-form>
     </el-card>
 </div>
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
+    var contextPath = '${request.contextPath}';
     var loginApp = new Vue({
         el: '#loginApp',
         data: {
@@ -57,7 +58,7 @@
                 password: '',
                 verifycode: '',
             },
-            scUrl: '/VerifyCode'
+            scUrl: '${request.contextPath}/VerifyCode'
         },
         methods: {
             handleSubmit: function(name){
@@ -66,11 +67,11 @@
                 this.$refs[name].validate(function(valid){
                    if (valid) {
                         //$this.$Spin.show();
-                        myPost('/login.api', $this.formData,
+                        myPost('${request.contextPath}/login.api', $this.formData,
                                 function(data){
                                     if(data.flag){
                                         $this.$message.success(data.msg);
-                                        window.location.href="/default";
+                                        window.location.href="${request.contextPath}/default";
                                     }else{
                                         $this.$message.error(data.msg);
                                         var users = data.items.user.fields;
@@ -104,7 +105,7 @@
                 });
             },
             reloadSC: function(){
-                this.scUrl = "/VerifyCode.gif?rm="+Math.round(Math.random()*10000);
+                this.scUrl = contextPath+"/VerifyCode.gif?rm="+Math.round(Math.random()*10000);
             }
         }
     });

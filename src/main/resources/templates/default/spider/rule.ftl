@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>规则管理</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css"/>
     <style>
         #main {
             margin: 10px;
@@ -61,10 +61,10 @@
 </div>
 <#--<script src="//unpkg.com/vue/dist/vue.js"></script>-->
 <#--<script src="//unpkg.com/element-ui@2.2.0/lib/index.js"></script>-->
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var main = new Vue({
         el: '#main',
@@ -111,7 +111,7 @@
                 this.$refs.itemForm.validate(function (valid) {
                     if (valid) {
                         $this.itemDlg.okBtnLoading = true;
-                        myPost('/spiderRule/save', $this.itemDlg.itemForm,
+                        myPost('${request.contextPath}/spiderRule/save', $this.itemDlg.itemForm,
                                 function (data) {
                                     if (data.flag) {
                                         $this.$message.success(data.msg);
@@ -145,7 +145,7 @@
                 this.initDlg(index, "添加新规则");
             },
             handleDelete: function(index) {
-                delRow(this, index, '/spiderRule/delete/'+this.listData[index].id, '您确定要删除此规则么？');
+                delRow(this, index, '${request.contextPath}/spiderRule/delete/'+this.listData[index].id, '您确定要删除此规则么？');
             },
             tableRowClassName: function(row) {
                 if (row.rowIndex === this.deleteRow.index) {

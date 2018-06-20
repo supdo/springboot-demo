@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>userList</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css"/>
     <style>
         #roleList {
             margin: 10px;
@@ -62,10 +62,10 @@
         </div>
     </el-dialog>
 </div>
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var roleList = new Vue({
         el: '#roleList',
@@ -121,7 +121,7 @@
                 this.initroleDlg(index, '修改角色');
             },
             handleDelete: function(index){
-                delRow(this, index, '/role/delete/'+this.listData[index].id, '您确定要删除此角色么？');
+                delRow(this, index, '${request.contextPath}/role/delete/'+this.listData[index].id, '您确定要删除此角色么？');
             },
             handlePermission: function(index){
                 this.permissionDlg.visible = true;
@@ -133,7 +133,7 @@
                 this.$refs.roleForm.validate(function(valid) {
                     if (valid) {
                         $this.roleDlg.okBtnLoading = true;
-                        myPost('/role/save', $this.roleDlg.roleForm,
+                        myPost('${request.contextPath}/role/save', $this.roleDlg.roleForm,
                             function (data) {
                                 if (data.flag) {
                                     $this.$message.success(data.msg);
@@ -166,7 +166,7 @@
             setPermission: function(){
                 var $this = this;
                 $this.permissionDlg.okBtnLoading = true;
-                myPost('/role/setPermission/'+$this.listData[$this.permissionDlg.index].id, {permissions: $this.permissionDlg.myPermissions.join('|')},
+                myPost('${request.contextPath}/role/setPermission/'+$this.listData[$this.permissionDlg.index].id, {permissions: $this.permissionDlg.myPermissions.join('|')},
                     function(data){
                         if(data.flag) {
                             $this.$message.success(data.msg);

@@ -49,7 +49,9 @@ public class MyInterceptor implements HandlerInterceptor {
             return;
         }else{
             Method clearResult = superClass.getMethod("clearResult");
-            clearResult.invoke(controller);
+            if(clearResult != null) {
+                clearResult.invoke(controller);
+            }
         }
     }
 }

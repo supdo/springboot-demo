@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Spider Test</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css"/>
     <style>
         #main {
             margin: 10px;
@@ -113,12 +113,12 @@
 </div>
 <#--<script src="//unpkg.com/vue/dist/vue.js"></script>-->
 <#--<script src="//unpkg.com/element-ui@2.2.0/lib/index.js"></script>-->
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/sockjs.min.js"></script>
-<script type="text/javascript" src="/js/stomp.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/sockjs.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/stomp.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var main = new Vue({
         el: '#main',
@@ -162,13 +162,13 @@
         methods: {
             initWebSocket: function() {
                 var $this = this;
-                var socket = new SockJS('/endpointSpider');
+                var socket = new SockJS('${request.contextPath}/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
                     $this.stompClient.connect({}, function (frame) {
                                 $this.connected = true;
                                 console.log('Connected: ' + frame);
-                                $this.stompClient.subscribe('/user/oto/notifications', function (data) {
+                                $this.stompClient.subscribe('${request.contextPath}/user/oto/notifications', function (data) {
                                     var dataBody = JSON.parse(data.body);
                                     $this.$notify.info({
                                         title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
@@ -228,7 +228,7 @@
                     type: 'warning',
                     callback: function (action, instance) {
                         if (action == 'confirm') {
-                            myPost('/spider/deleteSite/' + $this.sites[index].id, {},
+                            myPost('${request.contextPath}/spider/deleteSite/' + $this.sites[index].id, {},
                                     function (data) {
                                         if (data.flag) {
                                             $this.$message.success({message:data.msg, showClose:true});
@@ -256,7 +256,7 @@
                 this.$refs.TopForm.validate(function(valid) {
                     if (valid) {
                         $this.tableLoading = true;
-                        myPost('/spider/GetPL', $this.TopForm,
+                        myPost('${request.contextPath}/spider/GetPL', $this.TopForm,
                                 function(data){
                                     if(data.flag){
                                         $this.$message.success({message:data.msg, showClose:true});
@@ -283,7 +283,7 @@
             handleGetPC: function(index){
                 var $this = this;
                 $this.tableLoading = true;
-                myPost('/spider/GetPC/'+$this.listData[index].id, {},
+                myPost('${request.contextPath}/spider/GetPC/'+$this.listData[index].id, {},
                         function(data){
                             if(data.flag){
                                 $this.$message.success({message:data.msg, showClose:true});
@@ -304,7 +304,7 @@
             handlePostContent: function(index) {
                 var $this = this;
                 $this.tableLoading = true;
-                myPost('/spider/PostZootopia/'+$this.listData[index].id, {},
+                myPost('${request.contextPath}/spider/PostZootopia/'+$this.listData[index].id, {},
                         function(data){
                             if(data.flag){
                                 $this.$message.success({message:data.msg, showClose:true});
@@ -325,7 +325,7 @@
                 var $this = this;
                 $this.tableLoading = true;
                 $this.logDlg.visible = true;
-                myPost('/spider/PostZootopia/all/'+$this.TopForm.site, {},
+                myPost('${request.contextPath}/spider/PostZootopia/all/'+$this.TopForm.site, {},
                         function(data){
                             if(data.flag){
                                 $this.$message.success({message:data.msg, showClose:true});

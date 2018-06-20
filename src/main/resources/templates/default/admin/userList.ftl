@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>userList</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css"/>
     <style>
         #userList {
             margin: 10px;
@@ -62,10 +62,10 @@
 </div>
 <#--<script src="//unpkg.com/vue/dist/vue.js"></script>-->
 <#--<script src="//unpkg.com/element-ui@2.2.0/lib/index.js"></script>-->
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var userList = new Vue({
         el: '#userList',
@@ -118,7 +118,7 @@
                 this.inituserDlg(index, '编辑用户');
             },
             handleDelete: function(index){
-                delRow(this, index, '/user/delete/'+this.listData[index].id, '您确定要删除此用户么？');
+                delRow(this, index, '${request.contextPath}/user/delete/'+this.listData[index].id, '您确定要删除此用户么？');
             },
             handleAdd: function() {
                 this.inituserDlg(-1, '添加用户');
@@ -128,7 +128,7 @@
                 this.$refs.userForm.validate(function(valid) {
                     if (valid) {
                         $this.userDlg.okBtnLoading = true;
-                        myPost('/user/save', $this.userDlg.userForm,
+                        myPost('${request.contextPath}/user/save', $this.userDlg.userForm,
                             function(data){
                                 if(data.flag){
                                     $this.$message.success(data.msg);
@@ -165,7 +165,7 @@
             },
             setRoles: function(){
                 var $this = this;
-                myPost('/user/setRole/'+$this.listData[$this.roleDlg.index].id, {roles: $this.roleDlg.myRoles.join('|')},
+                myPost('${request.contextPath}/user/setRole/'+$this.listData[$this.roleDlg.index].id, {roles: $this.roleDlg.myRoles.join('|')},
                     function(data){
                         if(data.flag) {
                             $this.$message.success(data.msg);

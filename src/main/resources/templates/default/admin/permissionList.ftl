@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>userList</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css"/>
     <style>
         #permissionList {
             margin: 10px;
@@ -51,10 +51,10 @@
         </div>
     </el-dialog>
 </div>
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var permissionList = new Vue({
         el: '#permissionList',
@@ -98,14 +98,14 @@
                 this.initDlg(index, '修改权限');
             },
             handleDelete: function(index){
-                delRow(this, index, '/permission/delete/'+this.listData[index].id, '您确定要删除此权限么？');
+                delRow(this, index, '${request.contextPath}/permission/delete/'+this.listData[index].id, '您确定要删除此权限么？');
             },
             savePermission: function(){
                 var $this = this;
                 this.$refs.permissionForm.validate(function(valid) {
                     if (valid) {
                         $this.permissionDlg.okBtnLoading = true;
-                        myPost('/permission/save', $this.permissionDlg.permissionForm,
+                        myPost('${request.contextPath}/permission/save', $this.permissionDlg.permissionForm,
                                 function(data){
                                     if(data.flag){
                                         $this.$message.success(data.msg);

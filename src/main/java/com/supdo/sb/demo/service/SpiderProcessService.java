@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//@EnableTransactionManagement(proxyTargetClass = true)
 @Service
 public class SpiderProcessService extends BaseService{
 
@@ -107,7 +109,7 @@ public class SpiderProcessService extends BaseService{
         return lpl;
     }
 
-    @Transactional
+    //@Transactional
     public Result processContent(Long pageId){
         PageList pc = pageListRepository.findOne(pageId);
         SiteList siteList = siteListRepository.findOne(pc.getSite());
@@ -187,7 +189,7 @@ public class SpiderProcessService extends BaseService{
         return zootopiaCookie;
     }
 
-    @Transactional
+    //@Transactional
     public Result PostZootopia(Long id, SiteList site){
         try {
             Map<String, String> zootopiaCookie = isMyCacheZootopiaCookie();

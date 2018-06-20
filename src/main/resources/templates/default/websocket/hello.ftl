@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>WebSocket Hello</title>
-    <link rel="stylesheet" charset="utf-8" href="/element/style/style.css"/>
-    <link rel="stylesheet" charset="utf-8" href="/css/style.css" />
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/element/style/style.css"/>
+    <link rel="stylesheet" charset="utf-8" href="${request.contextPath}/css/style.css" />
     <style type="text/css">
         #hello {
             width: 600px;
@@ -57,12 +57,12 @@
         </el-form>
     </el-card>
 </div>
-<script type="text/javascript" src="/js/jquery.ajax.js"></script>
-<script type="text/javascript" src="/js/vue.min.js"></script>
-<script type="text/javascript" src="/element/element-ui.min.js"></script>
-<script type="text/javascript" src="/js/sockjs.min.js"></script>
-<script type="text/javascript" src="/js/stomp.min.js"></script>
-<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/jquery.ajax.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/vue.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/element/element-ui.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/sockjs.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/stomp.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/common.js"></script>
 <script type="text/javascript">
     var hello = new Vue({
         el: '#hello',
@@ -77,13 +77,13 @@
         methods: {
             handleConnect: function() {
                 var $this = this;
-                var socket = new SockJS('/endpointSpider');
+                var socket = new SockJS('${request.contextPath}/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
                     $this.stompClient.connect({}, function (frame) {
                         $this.connected = true;
                         console.log('Connected: ' + frame);
-                        $this.stompClient.subscribe('/topic', function (data) {
+                        $this.stompClient.subscribe('${request.contextPath}/topic', function (data) {
                             var dataBody = JSON.parse(data.body);
                             $this.$notify.info({
                                 title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
@@ -99,13 +99,13 @@
             },
             handleConnectOne: function() {
                 var $this = this;
-                var socket = new SockJS('/endpointSpider');
+                var socket = new SockJS('${request.contextPath}/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
                     $this.stompClient.connect({}, function (frame) {
                         $this.connected = true;
                         console.log('Connected: ' + frame);
-                        $this.stompClient.subscribe('/user/oto/notifications', function (data) {
+                        $this.stompClient.subscribe('${request.contextPath}/user/oto/notifications', function (data) {
                             var dataBody = JSON.parse(data.body);
                             $this.$notify.info({
                                 title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
@@ -135,7 +135,7 @@
                 if($this.stompClient == null) {
                     $this.$message.error('请先建立连接。');
                 }else{
-                    $this.stompClient.send("/hello", {}, JSON.stringify($this.chatFrom));
+                    $this.stompClient.send("${request.contextPath}/hello", {}, JSON.stringify($this.chatFrom));
                     $this.chatFrom.msg = '';
                 }
 
@@ -145,7 +145,7 @@
                 if($this.stompClient == null) {
                     $this.$message.error('请先建立连接。');
                 }else{
-                    $this.stompClient.send("/sayToUser", {}, JSON.stringify($this.chatFrom));
+                    $this.stompClient.send("${request.contextPath}/sayToUser", {}, JSON.stringify($this.chatFrom));
                     $this.chatFrom.msg = '';
                 }
             }

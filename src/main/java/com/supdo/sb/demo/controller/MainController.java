@@ -9,12 +9,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.supdo.sb.demo.plugin.Result;
+import io.buji.pac4j.subject.Pac4jSubjectFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.pac4j.core.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.supdo.sb.demo.entity.SysUser;
 import com.supdo.sb.demo.service.SysUserService;
 
-@RequiresAuthentication
+//@RequiresAuthentication
 @Controller
 public class MainController extends BaseController {
 
@@ -37,7 +41,8 @@ public class MainController extends BaseController {
 	public String testView(Map<String, Object> map) {
 		return render("test");
 	}
-	
+
+    @RequiresPermissions("add")
 	@RequiresAuthentication
 	@RequestMapping({"/", "/default"})
 	public String defaultView(Map<String, Object> map) {
@@ -46,6 +51,13 @@ public class MainController extends BaseController {
 		//SysUser user = (SysUser)o;
 		//map.put("test", "test");
 		return render("default");
+	}
+
+	@RequestMapping("/caslogin")
+	public String CasLogin(HttpServletRequest request, Map<String, Object> map) {
+		//String ssoUrl = String.format("http://%s/sso/login?%s", request.getHeader("host"), request.getQueryString());
+		String ssoUrl = String.format("http://%s/sso/login?%s", "10.56.69.71", request.getQueryString());
+		return "redirect:"+ssoUrl;
 	}
 	
 	@PostMapping("/login")
@@ -168,6 +180,6 @@ public class MainController extends BaseController {
 	@RequestMapping(path="/logout")
 	public String logout() {
 		SecurityUtils.getSubject().logout();
-		return "redirect:default";
+		return "redirect:/default";
 	}
 }

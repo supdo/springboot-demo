@@ -72,8 +72,8 @@
     </el-form>
 </div>
 <@layout.defaultjs />
-<script type="text/javascript" src="/js/sockjs.min.js"></script>
-<script type="text/javascript" src="/js/stomp.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/sockjs.min.js"></script>
+<script type="text/javascript" src="${request.contextPath}/js/stomp.min.js"></script>
 <script type="text/javascript">
     var main = new Vue({
         el: '#main',
@@ -95,13 +95,13 @@
         methods: {
             initWebSocket: function() {
                 var $this = this;
-                var socket = new SockJS('/endpointSpider');
+                var socket = new SockJS('${request.contextPath}/endpointSpider');
                 if($this.stompClient == null) {
                     $this.stompClient = Stomp.over(socket);
                     $this.stompClient.connect({}, function (frame) {
                                 $this.connected = true;
                                 console.log('Connected: ' + frame);
-                                $this.stompClient.subscribe('/user/oto/notifications', function (data) {
+                                $this.stompClient.subscribe('${request.contextPath}/user/oto/notifications', function (data) {
                                     var dataBody = JSON.parse(data.body);
                                     $this.$notify.info({
                                         title: '来自服务器的消息', message: dataBody.msg, position: 'bottom-right', showClose:true
@@ -121,7 +121,7 @@
                 var $this = this;
                 $this.tableLoading = true;
                 $this.logDlg.visible = true;
-                myPost('/spider/getMyShare/', $this.TopForm,
+                myPost('${request.contextPath}/spider/getMyShare/', $this.TopForm,
                         function(data){
                             if(data.flag){
                                 $this.$message.success({message:data.msg, showClose:true});
@@ -142,7 +142,7 @@
                 var $this = this;
                 $this.tableLoading = true;
                 $this.logDlg.visible = true;
-                myPost('/spider/voteMyShare/', $this.loginForm,
+                myPost('${request.contextPath}/spider/voteMyShare/', $this.loginForm,
                         function(data){
                             if(data.flag){
                                 $this.$message.success({message:data.msg, showClose:true});
