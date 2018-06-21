@@ -1,0 +1,45 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  #datasource
+  datasource:
+    druid:
+      main:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://133.160.102.93:3306/springboot?useUnicode=true&characterEncoding=utf-8
+        username: springboot
+        password: springboot@A1
+        driver-class-name: com.mysql.jdbc.Driver
+      crm:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: oracle.jdbc.driver.OracleDriver
+        url: jdbc:oracle:thin:@133.160.90.9:1521/CRMDB2
+        username: uqry_sel
+        password: uqry_sel123
+      #druid config
+      initialSize: 2
+      minIdle: 2
+      maxActive: 30
+      WebStatFilter:
+        exclusions: \*.js,*.gif,*.jpg,*.png,*.style,*.ico,/druid*
+      stat-view-servlet:
+        allow: 192.168.1.110,127.0.0.1
+        deny: 192.168.16.111
+      StatViewServlet:
+        loginUsername: druid
+        loginPassword: druid
+
+  #redis
+  redis:
+    host: 133.160.102.93
+    port: 6379
+    database: 0
+    password: redis_123
+    timeout: 86400
+    pool:
+      max-idle: 20
+      min-idle: 1
+      max-active: 20
+      max-wait: 60000
