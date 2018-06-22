@@ -1,3 +1,12 @@
+cas:
+  clientName: demo-clientName
+  prefixUrl: http://133.160.102.92/sso
+  loginUrl: ${cas.prefixUrl}/login
+  logoutUrl: ${cas.prefixUrl}/logout
+  serviceUrl: http://localhost:${server.port}${server.context-path}
+  callbackUrl: ${cas.serviceUrl}/callback
+  unauthorizedUrl: ${server.context-path}/403
+
 spring:
   jpa:
     hibernate:
@@ -8,9 +17,9 @@ spring:
     druid:
       main:
         type: com.alibaba.druid.pool.DruidDataSource
-        url: jdbc:mysql://localhost:3306/springboot?useUnicode=true&characterEncoding=utf-8
+        url: jdbc:mysql://133.160.102.93:3306/springboot?useUnicode=true&characterEncoding=utf-8
         username: springboot
-        password: springboot
+        password: springboot@A1
         #springboot@A1
         driver-class-name: com.mysql.jdbc.Driver
       crm:
@@ -32,10 +41,9 @@ spring:
         loginUsername: druid
         loginPassword: druid
 
-
   #redis
   redis:
-    host: 127.0.0.1
+    host: 133.160.102.93
     port: 6379
     database: 0
     password: redis_123

@@ -7,22 +7,14 @@ server:
       path: /error
 
 cas:
-  clientName: demo-clientName
-  prefixUrl: http://10.56.69.71/sso
-  loginUrl: ${cas.prefixUrl}/login
-  logoutUrl: ${cas.prefixUrl}/logout
-  serviceUrl: http://localhost:${server.port}${server.context-path}
-  callbackUrl: ${cas.serviceUrl}/callback
-  unauthorizedUrl: /403
-
   logout:
     followServiceRedirects: true
 
 
-## 开发/测试/生产环境分别对应dev/test/prd
+## 开发/测试/生产环境分别对应dev-bill/test/prd-mss/prd-bill
 spring:
   profiles:
-    active: prd
+    active: prd-bill
 #  aop:
 #    proxy-target-class: true
   #静态资源的配置
@@ -51,5 +43,5 @@ logging:
     org:
       springframework:
         web: INFO
-  file: web.log
+  file: springboot-demo.web.log
   

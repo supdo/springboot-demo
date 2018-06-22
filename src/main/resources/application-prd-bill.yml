@@ -1,3 +1,12 @@
+cas:
+  clientName: demo-clientName
+  prefixUrl: http://133.160.102.92/sso
+  loginUrl: ${cas.prefixUrl}/login
+  logoutUrl: ${cas.prefixUrl}/logout
+  serviceUrl: http://133.160.102.92${server.context-path}
+  callbackUrl: ${cas.serviceUrl}/callback
+  unauthorizedUrl: ${server.context-path}/403
+
 spring:
   jpa:
     hibernate:
@@ -11,6 +20,7 @@ spring:
         url: jdbc:mysql://133.160.102.93:3306/springboot?useUnicode=true&characterEncoding=utf-8
         username: springboot
         password: springboot@A1
+        #springboot@A1
         driver-class-name: com.mysql.jdbc.Driver
       crm:
         type: com.alibaba.druid.pool.DruidDataSource
